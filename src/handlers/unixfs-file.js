@@ -23,7 +23,8 @@ export async function handleUnixfsFile (request, env, ctx) {
   /** @type {Record<string, string>} */
   const headers = {
     Etag: etag,
-    'Cache-Control': 'public, max-age=29030400, immutable'
+    'Cache-Control': 'public, max-age=29030400, immutable',
+    'Content-Length': entry.size.toString()
   }
 
   console.log('unixfs root', entry.cid.toString())

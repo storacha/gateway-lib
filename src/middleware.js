@@ -6,6 +6,8 @@ import { parseCid, tryParseCid } from './util/cid.js'
 
 /** @typedef {import('./bindings').Context} Context */
 
+const CF_CACHE_MAX_OBJECT_SIZE = 512 * Math.pow(1024, 2) // 512MB to bytes
+
 /**
  * Adds CORS headers to the response.
  * @type {import('./bindings').Middleware<Context>}
@@ -160,6 +162,8 @@ export function withCdnCache (handler) {
 
     let response
     // Get from cache and return if existent
+    /** @type {Cache} */
+    // @ts-ignore Cloudflare Workers runtime exposes a single global cache object.
     const cache = caches.default
     response = await cache.match(request)
     if (response) {
@@ -167,9 +171,11 @@ export function withCdnCache (handler) {
     }
 
     response = await handler(request, env, ctx)
-    ctx.waitUntil(
-      putToCache(request, response, cache)
-    )
+
+    const contentLength = response.headers.get('content-length')
+    if (contentLength && parseInt(contentLength) < CF_CACHE_MAX_OBJECT_SIZE) {
+      ctx.waitUntil(cache.put(request, response.clone()))
+    }
 
     return response
   }
@@ -181,22 +187,4 @@ export function withCdnCache (handler) {
  */
 export function composeMiddleware (...middlewares) {
   return handler => middlewares.reduceRight((h, m) => m(h), handler)
-}
-
-const CF_CACHE_MAX_OBJECT_SIZE = 512 * Math.pow(1024, 2) // 512MB to bytes
-
-/**
- * Put received response to cache.
- *
- * @param {Request} request
- * @param {Response} response
- * @param {Cache} cache
- */
-async function putToCache (request, response, cache) {
-  const contentLengthMb = Number(response.headers.get('content-length'))
-
-  // Cache request in Cloudflare CDN if smaller than CF_CACHE_MAX_OBJECT_SIZE
-  if (contentLengthMb <= CF_CACHE_MAX_OBJECT_SIZE) {
-    await cache.put(request, response.clone())
-  }
 }
