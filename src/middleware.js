@@ -64,7 +64,9 @@ export function withErrorHandler (handler) {
       return await handler(request, env, ctx)
     } catch (/** @type {any} */ err) {
       if (!err.status || err.status >= 500) console.error(err.stack)
-      const msg = env.DEBUG === 'true' ? err.stack : err.message
+      const msg = env.DEBUG === 'true'
+        ? `${err.stack}${err?.cause?.stack ? `\n[cause]: ${err.cause.stack}` : ''}`
+        : err.message
       return new Response(msg, { status: err.status || 500 })
     }
   }
