@@ -32,6 +32,33 @@ export function withCorsHeaders (handler) {
 }
 
 /**
+ * Adds Content Disposition header to the response according to the request.
+ * https://github.com/ipfs/specs/blob/main/http-gateways/PATH_GATEWAY.md#request-query-parameters
+ * @type {import('./bindings').Middleware<Context>}
+ */
+export function withContentDispositionHeader (handler) {
+  return async (request, env, ctx) => {
+    let response = await handler(request, env, ctx)
+    // Clone the response so that it's no longer immutable (like if it comes
+    // from cache or fetch)
+    response = new Response(response.body, response)
+
+    const { searchParams } = new URL(request.url)
+    const fileName = searchParams.get('filename')
+    const download = searchParams.get('download')
+    if (fileName && download) {
+      response.headers.set('Content-Disposition', `attachment; filename="${fileName}"`)
+    } else if (download) {
+      response.headers.set('Content-Disposition', `attachment`)
+    } else if (fileName) {
+      response.headers.set('Content-Disposition', `inline; filename="${fileName}"`)
+    }
+
+    return response
+  }
+}
+
+/**
  * Catches any errors, logs them and returns a suitable response.
  * @type {import('./bindings').Middleware<Context>}
  */
