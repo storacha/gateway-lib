@@ -5,7 +5,7 @@
     "declaration": true,
     "declarationMap": true,
     "emitDeclarationOnly": true,
-    "outDir": "dist",
+    "outDir": "types",
     "allowJs": true,
     "checkJs": true,
     "strict": true,
@@ -16,5 +16,11 @@
     "lib": ["ES2022", "DOM"],
     "target": "ES2022",
     "module": "es2020",
+    "paths": {
+      "@web3-storage/gateway-lib": [ "./src/index.js" ],
+      "@web3-storage/gateway-lib/middleware": [ "./src/middleware.js" ],
+      "@web3-storage/gateway-lib/handlers": [ "./src/handlers/index.js" ],
+      "@web3-storage/gateway-lib/util": [ "./src/util/index.js" ],
+    }
   }
 }

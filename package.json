@@ -4,11 +4,11 @@
   "description": "Shared library of components for building an IPFS gateway in Cloudflare workers.",
   "main": "src/index.js",
   "type": "module",
-  "types": "./dist/index.d.ts",
+  "types": "./types/index.d.ts",
   "files": [
     "tsconfig.json",
     "src",
-    "dist"
+    "types"
   ],
   "exports": {
     ".": {
@@ -24,9 +24,28 @@
       "import": "./src/util/index.js"
     }
   },
+  "typesVersions": {
+    "*": {
+      "middleware": [
+        "types/middleware.d.ts"
+      ],
+      "handlers": [
+        "types/handlers/index.d.ts"
+      ],
+      "util": [
+        "types/util/index.d.ts"
+      ],
+      "*": [
+        "types/*"
+      ],
+      "types/*": [
+        "types/*"
+      ]
+    }
+  },
   "scripts": {
     "test": "node --test test/**/*.spec.js",
-    "build": "tsc && cp src/bindings.d.ts dist/bindings.d.ts"
+    "build": "tsc && cp src/bindings.d.ts types/bindings.d.ts"
   },
   "keywords": [
     "IPFS",
