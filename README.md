@@ -36,7 +36,7 @@ export default {
       withContentDispositionHeader,
       withErrorHandler,
       withHttpGet,
-      withParsedUrl,
+      withParsedIpfsUrl,
       withDagula // Note: provided by library consumer (sets `dagula` on ctx)
     )
     return middleware(handler)(request, env, ctx)
