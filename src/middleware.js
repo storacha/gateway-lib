@@ -172,9 +172,12 @@ export function withCdnCache (handler) {
 
     response = await handler(request, env, ctx)
 
-    const contentLength = response.headers.get('content-length')
-    if (contentLength && parseInt(contentLength) < CF_CACHE_MAX_OBJECT_SIZE) {
-      ctx.waitUntil(cache.put(request, response.clone()))
+    // cache the repsonse if success status
+    if (response.ok) {
+      const contentLength = response.headers.get('content-length')
+      if (contentLength && parseInt(contentLength) < CF_CACHE_MAX_OBJECT_SIZE) {
+        ctx.waitUntil(cache.put(request, response.clone()))
+      }
     }
 
     return response
