@@ -10,7 +10,7 @@ npm install @web3-storage/gateway-lib
 
 ## Usage
 
-This module provides middleware and handlers. Handlers require certain context properties to set which the middlewares can provide. The only BYO requirement is a mniddleware that adds a `dagula` instance to the context.
+This module provides middleware, handlers and some utilities. Handlers require certain context properties to set which the middlewares can provide. The only BYO requirement is a mniddleware that adds a `dagula` instance to the context.
 
 Typical usage may be something like:
 

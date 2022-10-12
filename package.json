@@ -43,5 +43,16 @@
   },
   "publishConfig": {
     "access": "public"
-  }
+  },
+  "directories": {
+    "test": "test"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/web3-storage/gateway-lib.git"
+  },
+  "bugs": {
+    "url": "https://github.com/web3-storage/gateway-lib/issues"
+  },
+  "homepage": "https://github.com/web3-storage/gateway-lib#readme"
 }
