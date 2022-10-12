@@ -1,5 +1,27 @@
 # Changelog
 
+## [1.2.1](https://github.com/web3-storage/gateway-lib/compare/v1.2.0...v1.2.1) (2022-10-12)
+
+
+### Bug Fixes
+
+* drop response clone ([#8](https://github.com/web3-storage/gateway-lib/issues/8)) ([59bb00b](https://github.com/web3-storage/gateway-lib/commit/59bb00be5a3acb0729616790fc283896c248f952))
+* only cache if success status ([#10](https://github.com/web3-storage/gateway-lib/issues/10)) ([103faf3](https://github.com/web3-storage/gateway-lib/commit/103faf3ca6a01424058d4380f56b96497e982d94))
+
+## [1.2.0](https://github.com/web3-storage/gateway-lib/compare/v1.1.0...v1.2.0) (2022-10-12)
+
+
+### Features
+
+* add with cdn cache middleware ([#7](https://github.com/web3-storage/gateway-lib/issues/7)) ([05e3f7a](https://github.com/web3-storage/gateway-lib/commit/05e3f7aeb5b7bc37294832c7ca48bde1a9e9bb49))
+* unixfs directory handler ([403ae6c](https://github.com/web3-storage/gateway-lib/commit/403ae6c9de9d4fc95a95dfab0546ce78bbf83794))
+
+
+### Bug Fixes
+
+* composeMiddleware type ([d101941](https://github.com/web3-storage/gateway-lib/commit/d101941e08a8b22945790f85aad7cf47f094182d))
+* export types from bindings ([eaaa11e](https://github.com/web3-storage/gateway-lib/commit/eaaa11eb321588b298bc8e95a3c941e44319ac49))
+
 ## [1.1.0](https://github.com/web3-storage/gateway-lib/compare/v1.0.2...v1.1.0) (2022-10-12)
 
 
