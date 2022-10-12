@@ -1,5 +1,19 @@
 # Changelog
 
+## [1.1.0](https://github.com/web3-storage/gateway-lib/compare/v1.0.2...v1.1.0) (2022-10-12)
+
+
+### Features
+
+* add content disposition header ([#4](https://github.com/web3-storage/gateway-lib/issues/4)) ([52ec13d](https://github.com/web3-storage/gateway-lib/commit/52ec13d0605fa1ff01c0a34a279ec81f71360be9))
+
+
+### Bug Fixes
+
+* built types ([c5cedc4](https://github.com/web3-storage/gateway-lib/commit/c5cedc46f1b4399f1852f4c73dd4c08b2a1780c6))
+* types ([b96c885](https://github.com/web3-storage/gateway-lib/commit/b96c885f6f9dc8f42e0e3e7202f908b29f7ea2df))
+* used middleware name ([eac0d2c](https://github.com/web3-storage/gateway-lib/commit/eac0d2ccc33ee0ac3ab8849fef373866c77fe754))
+
 ## [1.0.2](https://github.com/web3-storage/gateway-lib/compare/v1.0.1...v1.0.2) (2022-10-12)
 
 
