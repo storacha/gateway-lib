@@ -1,5 +1,13 @@
 # Changelog
 
+## [1.2.1](https://github.com/web3-storage/gateway-lib/compare/v1.2.0...v1.2.1) (2022-10-12)
+
+
+### Bug Fixes
+
+* drop response clone ([#8](https://github.com/web3-storage/gateway-lib/issues/8)) ([59bb00b](https://github.com/web3-storage/gateway-lib/commit/59bb00be5a3acb0729616790fc283896c248f952))
+* only cache if success status ([#10](https://github.com/web3-storage/gateway-lib/issues/10)) ([103faf3](https://github.com/web3-storage/gateway-lib/commit/103faf3ca6a01424058d4380f56b96497e982d94))
+
 ## [1.2.0](https://github.com/web3-storage/gateway-lib/compare/v1.1.0...v1.2.0) (2022-10-12)
 
 
