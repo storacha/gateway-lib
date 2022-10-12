@@ -21,12 +21,12 @@ import {
   withHttpGet,
   withParsedIpfsUrl,
   composeMiddleware
-} from '@web3-strage/gateway-lib/middleware'
+} from '@web3-storage/gateway-lib/middleware'
 import {
   handleUnixfs,
   handleBlock,
   handleCar
-} from '@web3-strage/gateway-lib/handlers'
+} from '@web3-storage/gateway-lib/handlers'
 
 export default {
   fetch (request, env, ctx) {

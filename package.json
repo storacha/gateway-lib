@@ -11,10 +11,18 @@
     "dist"
   ],
   "exports": {
-    ".": "./src/index.js",
-    "./middleware": "./src/middleware.js",
-    "./handlers": "./src/handlers/index.js",
-    "./util": "./src/util/index.js"
+    ".": {
+      "import": "./src/index.js"
+    },
+    "./middleware": {
+      "import": "./src/middleware.js"
+    },
+    "./handlers": {
+      "import": "./src/handlers/index.js"
+    },
+    "./util": {
+      "import": "./src/util/index.js"
+    }
   },
   "scripts": {
     "test": "node --test test/**/*.spec.js",
