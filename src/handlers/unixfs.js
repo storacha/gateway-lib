@@ -1,4 +1,5 @@
 /* eslint-env browser */
+import { handleUnixfsDir } from './unixfs-dir.js'
 import { handleUnixfsFile } from './unixfs-file.js'
 import { HttpError } from '../util/errors.js'
 
@@ -20,8 +21,7 @@ export async function handleUnixfs (request, env, ctx) {
   }
 
   if (entry.type.includes('directory')) {
-    // TODO
-    // return await handleUnixfsDir(request, env, ctx)
+    return await handleUnixfsDir(request, env, { ...ctx, unixfsEntry: entry })
   }
 
   return await handleUnixfsFile(request, env, { ...ctx, unixfsEntry: entry })

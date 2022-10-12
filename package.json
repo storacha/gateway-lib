@@ -46,7 +46,10 @@
   "scripts": {
     "test": "node --test test/**/*.spec.js",
     "lint": "standard",
-    "build": "tsc && cp src/bindings.d.ts types/bindings.d.ts"
+    "build": "npm run build:types && npm run build:templates",
+    "build:types": "tsc && cp src/bindings.d.ts types/bindings.d.ts",
+    "build:templates": "rm -f src/handlers/templates/bundle.cjs && echo '// @ts-nocheck' >> src/handlers/templates/bundle.cjs && handlebars src/handlers/templates/*.handlebars -c @web3-storage/handlebars/runtime.js >> src/handlers/templates/bundle.cjs",
+    "clean": "rm -rf types && rm -f src/handlers/templates/bundle.cjs"
   },
   "keywords": [
     "IPFS",
@@ -57,6 +60,8 @@
   "license": "Apache-2.0 OR MIT",
   "dependencies": {
     "@ipld/car": "^4.1.5",
+    "@web3-storage/handlebars": "^1.0.0",
+    "bytes": "^3.1.2",
     "chardet": "^1.5.0",
     "dagula": "^4.1.0",
     "magic-bytes.js": "^1.0.12",
@@ -67,6 +72,7 @@
   },
   "devDependencies": {
     "@ipld/dag-cbor": "^7.0.3",
+    "@types/bytes": "^3.1.1",
     "standard": "^17.0.0",
     "typescript": "^4.8.4"
   },

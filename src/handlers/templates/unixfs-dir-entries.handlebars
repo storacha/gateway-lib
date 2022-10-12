@@ -1,0 +1,18 @@
+      {{#each entries}}
+      <tr>
+        <td class="type-icon">
+          <div class="{{iconFromExt name}}">&nbsp;</div>
+        </td>
+        <td>
+          <a href="{{encodeURI path}}">{{name}}</a>
+        </td>
+        <td class="no-linebreak">
+          {{#if hash}}
+          <a class="ipfs-hash" translate="no" href={{#if @root.dnsLink}}"https://cid.ipfs.io/#{{encodeURIComponent hash}}" target="_blank" rel="noreferrer noopener"{{else}}"/ipfs/{{encodeURIComponent hash}}?filename={{encodeURIComponent name}}"{{/if}}>
+            {{shortHash hash}}
+          </a>
+          {{/if}}
+        </td>
+        <td class="no-linebreak">{{formatBytes size}}</td>
+      </tr>
+      {{/each}}
