@@ -45,6 +45,7 @@
   },
   "scripts": {
     "test": "node --test test/**/*.spec.js",
+    "lint": "standard",
     "build": "tsc && cp src/bindings.d.ts types/bindings.d.ts"
   },
   "keywords": [
@@ -66,6 +67,7 @@
   },
   "devDependencies": {
     "@ipld/dag-cbor": "^7.0.3",
+    "standard": "^17.0.0",
     "typescript": "^4.8.4"
   },
   "publishConfig": {

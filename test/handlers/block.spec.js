@@ -1,3 +1,4 @@
+/* eslint-env browser */
 import { describe, it } from 'node:test'
 import assert from 'node:assert'
 import { Dagula } from 'dagula'
@@ -9,7 +10,7 @@ import { handleBlock } from '../../src/handlers/block.js'
 import { mockWaitUntil, mockBlockstore } from '../helpers.js'
 
 describe('block handler', () => {
-  it('serves a block', async () => {    
+  it('serves a block', async () => {
     const waitUntil = mockWaitUntil()
     const path = ''
     const searchParams = new URLSearchParams()

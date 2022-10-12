@@ -1,7 +1,8 @@
+/* eslint-env browser */
 import { describe, it } from 'node:test'
 import assert from 'node:assert'
 import { Dagula } from 'dagula'
-import { equals, fromString } from 'uint8arrays'
+import { fromString } from 'uint8arrays'
 import { encode } from 'multiformats/block'
 import * as raw from 'multiformats/codecs/raw'
 import * as cbor from '@ipld/dag-cbor'
@@ -11,7 +12,7 @@ import { handleCar } from '../../src/handlers/car.js'
 import { mockWaitUntil, mockBlockstore } from '../helpers.js'
 
 describe('CAR handler', () => {
-  it('serves a CAR', async () => {    
+  it('serves a CAR', async () => {
     const waitUntil = mockWaitUntil()
     const path = ''
     const searchParams = new URLSearchParams()

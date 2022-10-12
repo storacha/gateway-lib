@@ -49,7 +49,7 @@ export function withContentDispositionHeader (handler) {
     if (fileName && download) {
       response.headers.set('Content-Disposition', `attachment; filename="${fileName}"`)
     } else if (download) {
-      response.headers.set('Content-Disposition', `attachment`)
+      response.headers.set('Content-Disposition', 'attachment')
     } else if (fileName) {
       response.headers.set('Content-Disposition', `inline; filename="${fileName}"`)
     }
@@ -122,7 +122,7 @@ export function withParsedIpfsUrl (handler) {
  * optionally call `.reset()` on the controller to restart the timeout.
  * @param {number} timeout Timeout in milliseconds.
  */
- export function createWithTimeoutController (timeout) {
+export function createWithTimeoutController (timeout) {
   /** @type {import('./bindings').Middleware<import('./bindings').TimeoutControllerContext>} */
   return handler => {
     return async (request, env, ctx) => {

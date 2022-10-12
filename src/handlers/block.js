@@ -1,5 +1,4 @@
 /* eslint-env browser */
-import { HttpError } from '../util/errors.js'
 
 /**
  * @typedef {import('../bindings').IpfsUrlContext & import('../bindings').DagulaContext & { timeoutController?: import('../bindings').TimeoutControllerContext['timeoutController'] }} BlockHandlerContext
