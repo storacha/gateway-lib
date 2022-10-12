@@ -6,8 +6,8 @@
   "type": "module",
   "types": "./dist/index.d.ts",
   "files": [
-    "*.js",
     "tsconfig.json",
+    "src",
     "dist"
   ],
   "exports": {
