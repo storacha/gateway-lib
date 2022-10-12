@@ -146,8 +146,8 @@ export function createWithTimeoutController (timeout) {
 }
 
 /**
- * @param {...import('./bindings').Middleware<any>} middlewares
- * @returns {import('./bindings').Middleware<any>}
+ * @param {...import('./bindings').Middleware<any, any, any>} middlewares
+ * @returns {import('./bindings').Middleware<any, any, any>}
  */
 export function composeMiddleware (...middlewares) {
   return handler => middlewares.reduceRight((h, m) => m(h), handler)
