@@ -14,10 +14,7 @@ const CF_CACHE_MAX_OBJECT_SIZE = 512 * Math.pow(1024, 2) // 512MB to bytes
  */
 export function withCorsHeaders (handler) {
   return async (request, env, ctx) => {
-    let response = await handler(request, env, ctx)
-    // Clone the response so that it's no longer immutable (like if it comes
-    // from cache or fetch)
-    response = new Response(response.body, response)
+    const response = await handler(request, env, ctx)
     const origin = request.headers.get('origin')
     if (origin) {
       response.headers.set('Access-Control-Allow-Origin', origin)
@@ -41,11 +38,7 @@ export function withCorsHeaders (handler) {
  */
 export function withContentDispositionHeader (handler) {
   return async (request, env, ctx) => {
-    let response = await handler(request, env, ctx)
-    // Clone the response so that it's no longer immutable (like if it comes
-    // from cache or fetch)
-    response = new Response(response.body, response)
-
+    const response = await handler(request, env, ctx)
     const { searchParams } = new URL(request.url)
     const fileName = searchParams.get('filename')
     const download = searchParams.get('download')
