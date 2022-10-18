@@ -1,5 +1,13 @@
 # Changelog
 
+## [1.3.0](https://github.com/web3-storage/gateway-lib/compare/v1.2.1...v1.3.0) (2022-10-18)
+
+
+### Features
+
+* better debug messages in dev ([89873c8](https://github.com/web3-storage/gateway-lib/commit/89873c8c585d71838e90da56ac97a6451fda4774))
+* send 412 when not cached and request wants it _only_ if it is cached ([#13](https://github.com/web3-storage/gateway-lib/issues/13)) ([0d822f8](https://github.com/web3-storage/gateway-lib/commit/0d822f84229bd3c1206f73eecd522b0796c58d87))
+
 ## [1.2.1](https://github.com/web3-storage/gateway-lib/compare/v1.2.0...v1.2.1) (2022-10-12)
 
 
