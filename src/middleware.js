@@ -165,6 +165,11 @@ export function withCdnCache (handler) {
       return response
     }
 
+    // If not cached and request wants it _only_ if it is cached, send 412
+    if (request.headers.get('Cache-Control') === 'only-if-cached') {
+      return new Response(null, { status: 412 })
+    }
+
     response = await handler(request, env, ctx)
 
     // cache the repsonse if success status
