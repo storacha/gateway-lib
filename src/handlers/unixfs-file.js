@@ -1,5 +1,4 @@
 /* eslint-env browser */
-/* global FixedLengthStream */
 import { toReadableStream } from '../util/streams.js'
 import { detectContentType } from '../util/mime.js'
 
@@ -61,9 +60,5 @@ export async function handleUnixfsFile (request, env, ctx) {
     }
   })())
 
-  return new Response(
-    // @ts-ignore FixedLengthStream is a cloudflare global
-    stream.pipeThrough(new FixedLengthStream(entry.size)),
-    { headers }
-  )
+  return new Response(stream, { headers })
 }

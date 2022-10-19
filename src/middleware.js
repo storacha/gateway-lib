@@ -1,5 +1,5 @@
 /* eslint-env browser */
-/* global caches */
+/* global caches FixedLengthStream */
 import { TimeoutController } from 'timeout-abort-controller'
 import { HttpError } from './util/errors.js'
 import { parseCid, tryParseCid } from './util/cid.js'
@@ -181,6 +181,28 @@ export function withCdnCache (handler) {
     }
 
     return response
+  }
+}
+
+/**
+ * Pipes reponse through a FixedLengthStream if `Content-Length` header is set.
+ * https://developers.cloudflare.com/workers/runtime-apis/streams/transformstream/#fixedlengthstream
+ *
+ * @type {import('./bindings').Middleware<Context>}
+ */
+export function withFixedLengthStream (handler) {
+  return async (request, env, ctx) => {
+    const response = await handler(request, env, ctx)
+    if (!response.headers.has('Content-Length') || !response.body) {
+      return response
+    }
+
+    const contentLength = parseInt(response.headers.get('Content-Length') || '0')
+    return new Response(
+      // @ts-ignore FixedLengthStream is a cloudflare global
+      response.body.pipeThrough(new FixedLengthStream(contentLength)),
+      response
+    )
   }
 }
 
