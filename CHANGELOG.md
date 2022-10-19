@@ -1,5 +1,16 @@
 # Changelog
 
+## [2.0.0](https://github.com/web3-storage/gateway-lib/compare/v1.3.0...v2.0.0) (2022-10-19)
+
+
+### ⚠ BREAKING CHANGES
+
+* The `handleUnixfsFile` handler no longer pipes through FixedLengthStream.
+
+### Features
+
+* add withFixedLengthStream middleware ([76bf7b5](https://github.com/web3-storage/gateway-lib/commit/76bf7b5e0bfe59350ea78b2269f88a8c73634004))
+
 ## [1.3.0](https://github.com/web3-storage/gateway-lib/compare/v1.2.1...v1.3.0) (2022-10-18)
 
 
