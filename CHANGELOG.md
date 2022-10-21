@@ -1,5 +1,12 @@
 # Changelog
 
+## [2.0.1](https://github.com/web3-storage/gateway-lib/compare/v2.0.0...v2.0.1) (2022-10-21)
+
+
+### Bug Fixes
+
+* paths with URI encoded components ([#15](https://github.com/web3-storage/gateway-lib/issues/15)) ([6467199](https://github.com/web3-storage/gateway-lib/commit/64671995fc61a0e24b7af37167c1170ca860cf83))
+
 ## [2.0.0](https://github.com/web3-storage/gateway-lib/compare/v1.3.0...v2.0.0) (2022-10-19)
 
 
