@@ -11,9 +11,7 @@ describe('withParsedIpfsUrl', () => {
     const env = { DEBUG: 'true' }
 
     const filename = 'Screenshot 2022-10-21 at 17.32.00.png'
-    const req = new Request(`http://localhost/ipfs/bafybeifwq2ywuoziunhtoecesw65p4exisfiskcklujke4fwrpx7y6b2ke/${encodeURIComponent(filename)}`, {
-      headers: { 'Cache-Control': 'only-if-cached' }
-    })
+    const req = new Request(`http://localhost/ipfs/bafybeifwq2ywuoziunhtoecesw65p4exisfiskcklujke4fwrpx7y6b2ke/${encodeURIComponent(filename)}`)
 
     const res = await withParsedIpfsUrl((req, env, ctx) => {
       assert.strictEqual(ctx.path, `/${filename}`)
