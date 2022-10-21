@@ -108,7 +108,7 @@ export function withParsedIpfsUrl (handler) {
       throw new HttpError(`unsupported protocol: ${pathParts[1]}`, { status: 400 })
     }
     dataCid = parseCid(pathParts[2])
-    const path = pathParts.slice(3).join('/')
+    const path = pathParts.slice(3).map(decodeURIComponent).join('/')
     const ipfsUrlCtx = { ...ctx, dataCid, path: path ? `/${path}` : '', searchParams }
     return handler(request, env, ipfsUrlCtx)
   }
