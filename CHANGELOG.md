@@ -1,5 +1,12 @@
 # Changelog
 
+## [2.0.2](https://github.com/web3-storage/gateway-lib/compare/v2.0.1...v2.0.2) (2022-11-11)
+
+
+### Bug Fixes
+
+* better content-type detection for svg ([#17](https://github.com/web3-storage/gateway-lib/issues/17)) ([3f01e09](https://github.com/web3-storage/gateway-lib/commit/3f01e099a44d011bce0f27680095989366a53988))
+
 ## [2.0.1](https://github.com/web3-storage/gateway-lib/compare/v2.0.0...v2.0.1) (2022-10-21)
 
 
