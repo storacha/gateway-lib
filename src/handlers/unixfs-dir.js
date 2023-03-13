@@ -24,7 +24,7 @@ const registerHelper = (name, fn) => Handlebars.registerHelper(name, fn)
 // @ts-ignore missing handlebars types
 const getTemplate = (name) => Handlebars.templates[name]
 
-registerHelper('encodeURI', encodeURI)
+registerHelper('encodeIPFSPath', (/** @type {string} */ p) => p.split('/').map(s => encodeURIComponent(s)).join('/'))
 registerHelper('encodeURIComponent', encodeURIComponent)
 registerHelper('iconFromExt', name => {
   const ext = name.slice(name.lastIndexOf('.') + 1)
@@ -61,7 +61,7 @@ export async function handleUnixfsDir (request, env, ctx) {
 
   const headers = {
     'Content-Type': 'text/html',
-    Etag: `"DirIndex-dagula@0.0.0_CID-${entry.cid}"`
+    Etag: `"DirIndex-gateway-lib@2.0.2_CID-${entry.cid}"`
   }
 
   if (request.method === 'HEAD') {
