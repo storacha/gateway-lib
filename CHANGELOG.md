@@ -1,5 +1,12 @@
 # Changelog
 
+## [2.0.3](https://github.com/web3-storage/gateway-lib/compare/v2.0.2...v2.0.3) (2023-03-14)
+
+
+### Bug Fixes
+
+* allow hash in filenames ([#19](https://github.com/web3-storage/gateway-lib/issues/19)) ([b3449c3](https://github.com/web3-storage/gateway-lib/commit/b3449c320eba4b98ddd51ef8bccf321e31e38f8a))
+
 ## [2.0.2](https://github.com/web3-storage/gateway-lib/compare/v2.0.1...v2.0.2) (2022-11-11)
 
 
