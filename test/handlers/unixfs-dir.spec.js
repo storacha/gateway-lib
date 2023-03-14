@@ -2,7 +2,7 @@
 import { describe, it } from 'node:test'
 import assert from 'node:assert'
 import { Dagula } from 'dagula'
-import { fromString, toString } from 'uint8arrays'
+import { fromString } from 'uint8arrays'
 import { encode } from 'multiformats/block'
 import * as raw from 'multiformats/codecs/raw'
 import * as pb from '@ipld/dag-pb'
@@ -28,7 +28,7 @@ describe('UnixFS handler', () => {
     const env = { DEBUG: 'true' }
     const req = new Request('http://localhost/ipfs/bafy')
     const res = await handleUnixfs(req, env, ctx)
-    const html = toString(new Uint8Array(await res.arrayBuffer()))
+    const html = await res.text()
     assert(html.includes('Puzzle%20People%20%231.png'))
   })
 })
