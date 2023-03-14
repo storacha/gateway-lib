@@ -59,20 +59,22 @@
   "author": "Alan Shaw",
   "license": "Apache-2.0 OR MIT",
   "dependencies": {
-    "@ipld/car": "^4.1.5",
+    "@ipld/car": "^5.1.0",
     "@web3-storage/handlebars": "^1.0.0",
     "bytes": "^3.1.2",
     "chardet": "^1.5.0",
-    "dagula": "^4.1.0",
+    "dagula": "^5.0.0",
     "magic-bytes.js": "^1.0.12",
     "mrmime": "^1.0.1",
-    "multiformats": "^9.9.0",
+    "multiformats": "^11.0.1",
     "timeout-abort-controller": "^3.0.0",
-    "uint8arrays": "^3.1.1"
+    "uint8arrays": "^4.0.3"
   },
   "devDependencies": {
-    "@ipld/dag-cbor": "^7.0.3",
+    "@ipld/dag-cbor": "^9.0.0",
+    "@ipld/dag-pb": "^4.0.2",
     "@types/bytes": "^3.1.1",
+    "ipfs-unixfs": "^11.0.0",
     "standard": "^17.0.0",
     "typescript": "^4.8.4"
   },
