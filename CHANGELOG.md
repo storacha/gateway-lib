@@ -1,5 +1,16 @@
 # Changelog
 
+## [3.0.0](https://github.com/web3-storage/gateway-lib/compare/v2.0.3...v3.0.0) (2023-05-02)
+
+
+### ⚠ BREAKING CHANGES
+
+* CARs returned for cid+path will now be rooted at the root cid rather than the resovled cid for the end of the path and include all blocks needed to verify the path was traveresed correctly.
+
+### Features
+
+* support ?car-scope and verifiable paths for format=car ([#21](https://github.com/web3-storage/gateway-lib/issues/21)) ([7593a2f](https://github.com/web3-storage/gateway-lib/commit/7593a2f4572065e44c599cc887e039d7956107dc))
+
 ## [2.0.3](https://github.com/web3-storage/gateway-lib/compare/v2.0.2...v2.0.3) (2023-03-14)
 
 
