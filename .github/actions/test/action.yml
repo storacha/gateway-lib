@@ -13,7 +13,5 @@ runs:
       shell: bash
     - run: npm run lint
       shell: bash
-    - run: npm run build
-      shell: bash
     - run: npm test
       shell: bash
