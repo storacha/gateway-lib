@@ -21,7 +21,6 @@ export async function handleCar (request, env, ctx) {
   // as etags are only relevant per path. If the caller has an etag for this path already, and
   // the root cid matches, then take the opportunity to send them a 304 as early as we can.
   //
-
   // Weak Etag W/ because we can't guarantee byte-for-byte identical
   // responses, but still want to benefit from HTTP Caching. Two CAR
   // responses for the same CID and selector will be logically equivalent,
@@ -35,7 +34,7 @@ export async function handleCar (request, env, ctx) {
   const { writer, out } = CarWriter.create(dataCid)
   ;(async () => {
     try {
-      for await (const block of dagula.getPath(dataCid + path, { carScope, signal: controller?.signal })) {
+      for await (const block of dagula.getPath(`${dataCid}${path}`, { carScope, signal: controller?.signal })) {
         await writer.put(block)
       }
     } catch (/** @type {any} */ err) {
