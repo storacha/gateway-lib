@@ -1,6 +1,7 @@
 /* eslint-env browser */
 import { CarWriter } from '@ipld/car'
 import { toReadableStream } from '../util/streams.js'
+import { HttpError } from '../util/errors.js'
 
 /**
  * @typedef {import('../bindings').IpfsUrlContext & import('../bindings').DagulaContext  & { timeoutController?: import('../bindings').TimeoutControllerContext['timeoutController'] }} CarHandlerContext
@@ -9,34 +10,31 @@ import { toReadableStream } from '../util/streams.js'
 
 /** @type {import('../bindings').Handler<CarHandlerContext>} */
 export async function handleCar (request, env, ctx) {
-  const { dataCid, path, timeoutController: controller, dagula } = ctx
+  const { dataCid, path, timeoutController: controller, dagula, searchParams } = ctx
   if (!dataCid) throw new Error('missing IPFS path')
   if (path == null) throw new Error('missing URL path')
   if (!dagula) throw new Error('missing dagula instance')
 
-  /** @type {CID} */
-  let cid
-  if (path && path !== '/') {
-    const entry = await dagula.getUnixfs(`${dataCid}${path}`, { signal: controller?.signal })
-    cid = entry.cid
-  } else {
-    cid = dataCid
-  }
+  const carScope = getCarScope(searchParams)
 
+  // Use root CID for etag even tho we may resolve a different root for the terminus of the path
+  // as etags are only relevant per path. If the caller has an etag for this path already, and
+  // the root cid matches, then take the opportunity to send them a 304 as early as we can.
+  //
   // Weak Etag W/ because we can't guarantee byte-for-byte identical
   // responses, but still want to benefit from HTTP Caching. Two CAR
   // responses for the same CID and selector will be logically equivalent,
   // but when CAR is streamed, then in theory, blocks may arrive from
   // datastore in non-deterministic order.
-  const etag = `W/"${cid}.car"`
+  const etag = `W/"${dataCid}.car"`
   if (request.headers.get('If-None-Match') === etag) {
     return new Response(null, { status: 304 })
   }
 
-  const { writer, out } = CarWriter.create(cid)
+  const { writer, out } = CarWriter.create(dataCid)
   ;(async () => {
     try {
-      for await (const block of dagula.get(cid, { signal: controller?.signal })) {
+      for await (const block of dagula.getPath(`${dataCid}${path}`, { carScope, signal: controller?.signal })) {
         await writer.put(block)
       }
     } catch (/** @type {any} */ err) {
@@ -46,9 +44,7 @@ export async function handleCar (request, env, ctx) {
     }
   })()
 
-  const { searchParams } = new URL(request.url)
-
-  const name = searchParams.get('filename') || `${cid}.car`
+  const name = searchParams.get('filename') || `${dataCid}.car`
   const utf8Name = encodeURIComponent(name)
   // eslint-disable-next-line no-control-regex
   const asciiName = encodeURIComponent(name.replace(/[^\x00-\x7F]/g, '_'))
@@ -64,4 +60,13 @@ export async function handleCar (request, env, ctx) {
   }
 
   return new Response(toReadableStream(out), { headers })
+}
+
+/** @param {URLSearchParams} searchParams */
+function getCarScope (searchParams) {
+  const carScope = searchParams.get('car-scope') ?? 'all'
+  if (carScope === 'all' || carScope === 'file' || carScope === 'block') {
+    return carScope
+  }
+  throw new HttpError(`unsupported car-scope: ${carScope}`, { status: 400 })
 }
