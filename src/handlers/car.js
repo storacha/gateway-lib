@@ -15,7 +15,8 @@ export async function handleCar (request, env, ctx) {
   if (path == null) throw new Error('missing URL path')
   if (!dagula) throw new Error('missing dagula instance')
 
-  const carScope = getCarScope(searchParams)
+  const dagScope = getDagScope(searchParams)
+  const { version, order, dups } = getAcceptParams(request.headers)
 
   // Use root CID for etag even tho we may resolve a different root for the terminus of the path
   // as etags are only relevant per path. If the caller has an etag for this path already, and
@@ -34,7 +35,8 @@ export async function handleCar (request, env, ctx) {
   const { writer, out } = CarWriter.create(dataCid)
   ;(async () => {
     try {
-      for await (const block of dagula.getPath(`${dataCid}${path}`, { carScope, signal: controller?.signal })) {
+      for await (const block of dagula.getPath(`${dataCid}${path}`, { dagScope, order, signal: controller?.signal })) {
+        // @ts-expect-error
         await writer.put(block)
       }
     } catch (/** @type {any} */ err) {
@@ -52,7 +54,7 @@ export async function handleCar (request, env, ctx) {
   const headers = {
     // Make it clear we don't support range-requests over a car stream
     'Accept-Ranges': 'none',
-    'Content-Type': 'application/vnd.ipld.car; version=1',
+    'Content-Type': `application/vnd.ipld.car; version=${version}; order=${order}; dups=${dups ? 'y' : 'n'};`,
     'X-Content-Type-Options': 'nosniff',
     Etag: etag,
     'Cache-Control': 'public, max-age=29030400, immutable',
@@ -62,11 +64,45 @@ export async function handleCar (request, env, ctx) {
   return new Response(toReadableStream(out), { headers })
 }
 
-/** @param {URLSearchParams} searchParams */
-function getCarScope (searchParams) {
-  const carScope = searchParams.get('car-scope') ?? 'all'
-  if (carScope === 'all' || carScope === 'file' || carScope === 'block') {
-    return carScope
+/**
+ * @param {URLSearchParams} searchParams
+ * @returns {import('dagula').DagScope}
+ */
+function getDagScope (searchParams) {
+  const scope = searchParams.get('dag-scope') ?? 'all'
+  if (scope === 'all' || scope === 'entity' || scope === 'block') {
+    return scope
   }
-  throw new HttpError(`unsupported car-scope: ${carScope}`, { status: 400 })
+  throw new HttpError(`unsupported dag-scope: ${scope}`, { status: 400 })
+}
+
+/**
+ * @param {Headers} headers
+ * @returns {{ version: 1, order: import('dagula').BlockOrder, dups: true }}
+ */
+function getAcceptParams (headers) {
+  const accept = headers.get('accept')
+  if (!accept) return { version: 1, order: 'dfs', dups: true }
+
+  const types = accept.split(',').map(s => s.trim())
+  const carType = types.find(t => t.startsWith('application/vnd.ipld.car'))
+  if (!carType) return { version: 1, order: 'dfs', dups: true }
+
+  const paramPairs = carType.split(';').slice(1).map(s => s.trim())
+  const { version, order, dups } = Object.fromEntries(paramPairs.map(p => p.split('=').map(s => s.trim())))
+
+  // only CARv1
+  if (version != null && version !== '1') {
+    throw new HttpError(`unsupported accept parameter: version=${version}`, { status: 400 })
+  }
+  // only yes duplicates
+  if (dups && dups !== 'y') {
+    throw new HttpError(`unsupported accept parameter: dups=${dups}`, { status: 400 })
+  }
+  // only dfs or unk ordering
+  if (order && order !== 'dfs' && order !== 'unk') {
+    throw new HttpError(`unsupported accept parameter: order=${order}`, { status: 400 })
+  }
+
+  return { version: 1, order, dups: true }
 }
