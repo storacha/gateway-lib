@@ -1,5 +1,12 @@
 # Changelog
 
+## [3.1.0](https://github.com/web3-storage/gateway-lib/compare/v3.0.0...v3.1.0) (2023-05-19)
+
+
+### Features
+
+* implement block order signaling ([#25](https://github.com/web3-storage/gateway-lib/issues/25)) ([1862165](https://github.com/web3-storage/gateway-lib/commit/18621658dc921c6754440b3e35b15494b266e0d6))
+
 ## [3.0.0](https://github.com/web3-storage/gateway-lib/compare/v2.0.3...v3.0.0) (2023-05-02)
 
 
