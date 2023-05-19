@@ -58,7 +58,7 @@ export async function handleCar (request, env, ctx) {
   const headers = {
     // Make it clear we don't support range-requests over a car stream
     'Accept-Ranges': 'none',
-    'Content-Type': `application/vnd.ipld.car; version=${version}; order=${order}; dups=${dups ? 'y' : 'n'};`,
+    'Content-Type': `application/vnd.ipld.car; version=${version}; order=${order}; dups=${dups ? 'y' : 'n'}`,
     'X-Content-Type-Options': 'nosniff',
     Etag: etag,
     'Cache-Control': 'public, max-age=29030400, immutable',
