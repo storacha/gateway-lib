@@ -6,7 +6,7 @@ import { HttpError } from '../util/errors.js'
 /**
  * @typedef {import('../bindings').IpfsUrlContext & import('../bindings').DagulaContext  & { timeoutController?: import('../bindings').TimeoutControllerContext['timeoutController'] }} CarHandlerContext
  * @typedef {import('multiformats').CID} CID
- * @typedef {{ version: 1, order: import('dagula').BlockOrder, dups: true }} CarParams
+ * @typedef {{ version: 1|2, order: import('dagula').BlockOrder, dups: boolean }} CarParams
  */
 
 /** @type {CarParams} */
