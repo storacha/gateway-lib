@@ -6,7 +6,11 @@ import { HttpError } from '../util/errors.js'
 /**
  * @typedef {import('../bindings').IpfsUrlContext & import('../bindings').DagulaContext  & { timeoutController?: import('../bindings').TimeoutControllerContext['timeoutController'] }} CarHandlerContext
  * @typedef {import('multiformats').CID} CID
+ * @typedef {{ version: 1, order: import('dagula').BlockOrder, dups: true }} CarParams
  */
+
+/** @type {CarParams} */
+const DefaultCarParams = { version: 1, order: 'unk', dups: true }
 
 /** @type {import('../bindings').Handler<CarHandlerContext>} */
 export async function handleCar (request, env, ctx) {
@@ -78,15 +82,15 @@ function getDagScope (searchParams) {
 
 /**
  * @param {Headers} headers
- * @returns {{ version: 1, order: import('dagula').BlockOrder, dups: true }}
+ * @returns {CarParams}
  */
 function getAcceptParams (headers) {
   const accept = headers.get('accept')
-  if (!accept) return { version: 1, order: 'dfs', dups: true }
+  if (!accept) return DefaultCarParams
 
   const types = accept.split(',').map(s => s.trim())
   const carType = types.find(t => t.startsWith('application/vnd.ipld.car'))
-  if (!carType) return { version: 1, order: 'dfs', dups: true }
+  if (!carType) return DefaultCarParams
 
   const paramPairs = carType.split(';').slice(1).map(s => s.trim())
   const { version, order, dups } = Object.fromEntries(paramPairs.map(p => p.split('=').map(s => s.trim())))

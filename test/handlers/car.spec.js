@@ -72,6 +72,10 @@ describe('CAR handler', () => {
       }
     })
     const res = await handleCar(req, env, ctx)
+    const contentType = res.headers.get('Content-Type')
+    assert(contentType)
+    assert(contentType.includes('order=dfs'))
+
     const reader = await CarReader.fromBytes(new Uint8Array(await res.arrayBuffer()))
     const roots = await reader.getRoots()
     assert.strictEqual(roots[0].toString(), rootBlock.cid.toString())
@@ -87,12 +91,7 @@ describe('CAR handler', () => {
     assert.strictEqual(blocks[4].cid.toString(), leafBlock1.cid.toString())
   })
 
-  // unk = unknown, so could change...we're just asserting here that we get a
-  // different ordering from dfs, which tells us that our accept param is being
-  // successfully passed to the library.
-  //
-  // Note: unk is technically also dfs, so this test could become invalid in
-  // the future.
+  // unk = unknown, so underlying implementation could change in the future
   it('serves a CAR with accept parameter order=unk', async () => {
     const waitUntil = mockWaitUntil()
 
@@ -113,6 +112,10 @@ describe('CAR handler', () => {
       }
     })
     const res = await handleCar(req, env, ctx)
+    const contentType = res.headers.get('Content-Type')
+    assert(contentType)
+    assert(contentType.includes('order=unk'))
+
     const reader = await CarReader.fromBytes(new Uint8Array(await res.arrayBuffer()))
     const roots = await reader.getRoots()
     assert.strictEqual(roots[0].toString(), rootBlock.cid.toString())
@@ -121,17 +124,10 @@ describe('CAR handler', () => {
     for await (const b of reader.blocks()) {
       blocks.push(b)
     }
-    assert.notDeepEqual(
-      // dfs order
-      [
-        rootBlock.cid.toString(),
-        branchBlock0.cid.toString(),
-        leafBlock0.cid.toString(),
-        branchBlock1.cid.toString(),
-        leafBlock1.cid.toString()
-      ],
-      // unk order
-      blocks.map(b => b.cid.toString())
-    )
+    assert.strictEqual(blocks[0].cid.toString(), rootBlock.cid.toString())
+    assert.strictEqual(blocks[1].cid.toString(), branchBlock0.cid.toString())
+    assert.strictEqual(blocks[2].cid.toString(), branchBlock1.cid.toString())
+    assert.strictEqual(blocks[3].cid.toString(), leafBlock0.cid.toString())
+    assert.strictEqual(blocks[4].cid.toString(), leafBlock1.cid.toString())
   })
 })
