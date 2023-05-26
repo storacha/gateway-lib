@@ -26,7 +26,7 @@ describe('withParsedIpfsUrl', () => {
     const waitUntil = mockWaitUntil()
     const ctx = { waitUntil }
     const env = { DEBUG: 'true' }
-    const req = new Request(`http://localhost/ipfs/bafybeieif6atpruwmmafx2wftjdxb73cabchclkoqi3okc3itkrp67htlysegmentNo40`)
+    const req = new Request('http://localhost/ipfs/bafybeieif6atpruwmmafx2wftjdxb73cabchclkoqi3okc3itkrp67htlysegmentNo40')
 
     try {
       await withParsedIpfsUrl(async () => new Response())(req, env, ctx)
