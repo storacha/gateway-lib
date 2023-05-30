@@ -107,7 +107,11 @@ export function withParsedIpfsUrl (handler) {
     if (pathParts[1] !== 'ipfs') {
       throw new HttpError(`unsupported protocol: ${pathParts[1]}`, { status: 400 })
     }
-    dataCid = parseCid(pathParts[2])
+    try {
+      dataCid = parseCid(pathParts[2])
+    } catch {
+      throw new HttpError(`invalid CID: ${pathParts[2]}`, { status: 400 })
+    }
     const path = pathParts.slice(3).map(decodeURIComponent).join('/')
     const ipfsUrlCtx = { ...ctx, dataCid, path: path ? `/${path}` : '', searchParams }
     return handler(request, env, ipfsUrlCtx)
