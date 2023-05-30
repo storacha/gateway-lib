@@ -1,5 +1,12 @@
 # Changelog
 
+## [3.1.1](https://github.com/web3-storage/gateway-lib/compare/v3.1.0...v3.1.1) (2023-05-30)
+
+
+### Bug Fixes
+
+* return HTTP 400 for CID parse error ([#27](https://github.com/web3-storage/gateway-lib/issues/27)) ([31eea2e](https://github.com/web3-storage/gateway-lib/commit/31eea2eefee0816b38e2bd40b3d52b687167fa20))
+
 ## [3.1.0](https://github.com/web3-storage/gateway-lib/compare/v3.0.0...v3.1.0) (2023-05-19)
 
 
