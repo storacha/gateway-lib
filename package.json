@@ -50,6 +50,7 @@
     "build": "npm run build:types && npm run build:templates",
     "build:types": "tsc && cp src/bindings.d.ts types/bindings.d.ts",
     "build:templates": "rm -f src/handlers/templates/bundle.cjs && echo '// @ts-nocheck' >> src/handlers/templates/bundle.cjs && handlebars src/handlers/templates/*.handlebars -c @web3-storage/handlebars/runtime.js >> src/handlers/templates/bundle.cjs",
+    "assets": "w3 up src/handlers/templates/assets/",
     "clean": "rm -rf types && rm -f src/handlers/templates/bundle.cjs"
   },
   "keywords": [
