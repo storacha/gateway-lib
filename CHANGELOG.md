@@ -1,5 +1,12 @@
 # Changelog
 
+## [3.2.0](https://github.com/web3-storage/gateway-lib/compare/v3.1.1...v3.2.0) (2023-06-07)
+
+
+### Features
+
+* pull out 80k of css to a file so it can be cached ([#30](https://github.com/web3-storage/gateway-lib/issues/30)) ([71bdf8e](https://github.com/web3-storage/gateway-lib/commit/71bdf8e0a8c1f968356b4f17bbc6a14eecbccfbd))
+
 ## [3.1.1](https://github.com/web3-storage/gateway-lib/compare/v3.1.0...v3.1.1) (2023-05-30)
 
 
