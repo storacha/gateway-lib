@@ -1,5 +1,12 @@
 # Changelog
 
+## [3.2.2](https://github.com/web3-storage/gateway-lib/compare/v3.2.1...v3.2.2) (2023-06-09)
+
+
+### Bug Fixes
+
+* entry size ([6b31e14](https://github.com/web3-storage/gateway-lib/commit/6b31e14c57ec66ec2dbec093c37af81ed63482fc))
+
 ## [3.2.1](https://github.com/web3-storage/gateway-lib/compare/v3.2.0...v3.2.1) (2023-06-09)
 
 
