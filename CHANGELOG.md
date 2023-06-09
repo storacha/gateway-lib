@@ -1,5 +1,12 @@
 # Changelog
 
+## [3.2.1](https://github.com/web3-storage/gateway-lib/compare/v3.2.0...v3.2.1) (2023-06-09)
+
+
+### Bug Fixes
+
+* types for unixfs entry ([89efc2e](https://github.com/web3-storage/gateway-lib/commit/89efc2ef24cc92639ac3f46a1f7c9e8471113de1))
+
 ## [3.2.0](https://github.com/web3-storage/gateway-lib/compare/v3.1.1...v3.2.0) (2023-06-07)
 
 
