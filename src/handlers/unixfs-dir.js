@@ -79,7 +79,7 @@ export async function handleUnixfsDir (request, env, ctx) {
         path: entryPath(entry.path),
         name: entry.name,
         hash: entry.cid.toString(),
-        size: entry.size,
+        size: Number(entry.size),
         backLink: parts.length > 1 ? entryPath(parts.slice(0, -1).join('/')) : '',
         breadcrumbs: ['ipfs', ...parts].map((name, i, parts) => {
           const path = i > 0 ? entryPath(parts.slice(1, i + 1).join('/')) : null
@@ -96,7 +96,7 @@ export async function handleUnixfsDir (request, env, ctx) {
               path: entryPath(dirEntry.path),
               name: dirEntry.name,
               hash: dirEntry.cid.toString(),
-              size: dirEntry.size
+              size: Number(dirEntry.size)
             }]
           })
         )
