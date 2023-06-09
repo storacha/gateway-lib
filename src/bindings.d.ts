@@ -1,5 +1,5 @@
 import type { CID } from 'multiformats/cid'
-import type { UnixFSEntry } from '@web3-storage/fast-unixfs-exporter'
+import type { UnixFSEntry } from 'ipfs-unixfs-exporter'
 import type { IDagula } from 'dagula'
 import type { TimeoutController } from 'timeout-abort-controller'
 
