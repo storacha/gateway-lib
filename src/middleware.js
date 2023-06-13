@@ -99,7 +99,7 @@ export function withParsedIpfsUrl (handler) {
       if (hostParts[1] !== 'ipfs') {
         throw new HttpError(`unsupported protocol: ${hostParts[1]}`, { status: 400 })
       }
-      const ipfsUrlCtx = { ...ctx, dataCid, path: pathname, searchParams }
+      const ipfsUrlCtx = Object.assign(ctx, { dataCid, path: pathname, searchParams })
       return handler(request, env, ipfsUrlCtx)
     }
 
@@ -113,7 +113,7 @@ export function withParsedIpfsUrl (handler) {
       throw new HttpError(`invalid CID: ${pathParts[2]}`, { status: 400 })
     }
     const path = pathParts.slice(3).map(decodeURIComponent).join('/')
-    const ipfsUrlCtx = { ...ctx, dataCid, path: path ? `/${path}` : '', searchParams }
+    const ipfsUrlCtx = Object.assign(ctx, { dataCid, path: path ? `/${path}` : '', searchParams })
     return handler(request, env, ipfsUrlCtx)
   }
 }
