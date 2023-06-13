@@ -1,5 +1,12 @@
 # Changelog
 
+## [3.2.3](https://github.com/web3-storage/gateway-lib/compare/v3.2.2...v3.2.3) (2023-06-13)
+
+
+### Bug Fixes
+
+* assign to context do not overwrite ([#34](https://github.com/web3-storage/gateway-lib/issues/34)) ([16a0ff9](https://github.com/web3-storage/gateway-lib/commit/16a0ff9c9d870dc0b8e87234d1894d071972eadf))
+
 ## [3.2.2](https://github.com/web3-storage/gateway-lib/compare/v3.2.1...v3.2.2) (2023-06-09)
 
 
