@@ -9,6 +9,24 @@ import { parseCid, tryParseCid } from './util/cid.js'
 const CF_CACHE_MAX_OBJECT_SIZE = 512 * Math.pow(1024, 2) // 512MB to bytes
 
 /**
+ * Creates a fresh context object that can be mutated by the request.
+ *
+ * The original context object is _shared_ among requests so should be cloned
+ * ASAP using this middleware and the clone should be mutated not the original.
+ *
+ * Some properties in the original context object are not enumerable so need
+ * to be expicitly added.
+ *
+ * @type {import('./bindings').Middleware<Context>}
+ */
+export function withContext (handler) {
+  return (request, env, ctx) => {
+    const context = { ...ctx, waitUntil: ctx.waitUntil.bind(ctx) }
+    return handler(request, env, context)
+  }
+}
+
+/**
  * Adds CORS headers to the response.
  * @type {import('./bindings').Middleware<Context>}
  */
