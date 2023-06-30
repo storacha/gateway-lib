@@ -1,5 +1,12 @@
 # Changelog
 
+## [3.2.4](https://github.com/web3-storage/gateway-lib/compare/v3.2.3...v3.2.4) (2023-06-30)
+
+
+### Bug Fixes
+
+* add context cloning middleware ([#36](https://github.com/web3-storage/gateway-lib/issues/36)) ([8b537e2](https://github.com/web3-storage/gateway-lib/commit/8b537e2a379b7a05fcb08c20f33f30e6b2076649))
+
 ## [3.2.3](https://github.com/web3-storage/gateway-lib/compare/v3.2.2...v3.2.3) (2023-06-13)
 
 
