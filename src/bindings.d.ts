@@ -6,7 +6,7 @@ import type { TimeoutController } from 'timeout-abort-controller'
 export {}
 
 export interface Environment {
-  DEBUG: string
+  DEBUG?: string
 }
 
 export interface Context {

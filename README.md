@@ -16,6 +16,7 @@ Typical usage may be something like:
 
 ```js
 import {
+  withContext,
   withCorsHeaders,
   withContentDispositionHeader,
   withErrorHandler,
@@ -32,6 +33,7 @@ import {
 export default {
   fetch (request, env, ctx) {
     const middleware = composeMiddleware(
+      withContext,
       withCorsHeaders,
       withContentDispositionHeader,
       withErrorHandler,
