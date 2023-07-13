@@ -193,7 +193,6 @@ export function withCdnCache (handler) {
     }
 
     response = await handler(request, env, ctx)
-    console.log('got response', response)
 
     // cache the repsonse if success status
     if (response.ok) {
