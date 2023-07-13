@@ -1,5 +1,12 @@
 # Changelog
 
+## [3.3.0](https://github.com/web3-storage/gateway-lib/compare/v3.2.4...v3.3.0) (2023-07-13)
+
+
+### Features
+
+* cache responses without a content-length header ([#38](https://github.com/web3-storage/gateway-lib/issues/38)) ([e65eb6c](https://github.com/web3-storage/gateway-lib/commit/e65eb6c971509cc399fc18f8dcf5664397dca29b))
+
 ## [3.2.4](https://github.com/web3-storage/gateway-lib/compare/v3.2.3...v3.2.4) (2023-06-30)
 
 
