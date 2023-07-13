@@ -205,7 +205,7 @@ export function withCdnCache (handler) {
         // If no content length (a directory or non-unixfs for example) then
         // try to cache anyway, chances are that total response size will be
         // less than CF_CACHE_MAX_OBJECT_SIZE anyways.
-        ctx.waitUntil(cache.put(request, response.clone()).catch(err => console.warn(err)))
+        ctx.waitUntil(cache.put(request, response.clone()).catch(() => {}))
       }
     }
 
