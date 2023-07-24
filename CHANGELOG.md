@@ -1,5 +1,13 @@
 # Changelog
 
+## [3.3.1](https://github.com/web3-storage/gateway-lib/compare/v3.3.0...v3.3.1) (2023-07-24)
+
+
+### Bug Fixes
+
+* only add Content-Disposition header if not already exists ([#40](https://github.com/web3-storage/gateway-lib/issues/40)) ([f3cda76](https://github.com/web3-storage/gateway-lib/commit/f3cda76278a342934572c8f4944512f778df9a70))
+* only cache get requests ([#42](https://github.com/web3-storage/gateway-lib/issues/42)) ([e5b1fe2](https://github.com/web3-storage/gateway-lib/commit/e5b1fe204d61b534157948341b9fee02e3b06cc3))
+
 ## [3.3.0](https://github.com/web3-storage/gateway-lib/compare/v3.2.4...v3.3.0) (2023-07-13)
 
 
