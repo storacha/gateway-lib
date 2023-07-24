@@ -1,6 +1,6 @@
 {
   "name": "@web3-storage/gateway-lib",
-  "version": "3.3.1",
+  "version": "3.3.2",
   "description": "Shared library of components for building an IPFS gateway in Cloudflare workers.",
   "main": "src/index.js",
   "type": "module",
