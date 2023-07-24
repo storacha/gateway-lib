@@ -1,5 +1,12 @@
 # Changelog
 
+## [3.3.2](https://github.com/web3-storage/gateway-lib/compare/v3.3.1...v3.3.2) (2023-07-24)
+
+
+### Bug Fixes
+
+* do not cache if content-range response ([74972e7](https://github.com/web3-storage/gateway-lib/commit/74972e77d8b4b2bde75374146a55fb7671bd7b56))
+
 ## [3.3.1](https://github.com/web3-storage/gateway-lib/compare/v3.3.0...v3.3.1) (2023-07-24)
 
 
