@@ -58,16 +58,17 @@ export function withContentDispositionHeader (handler) {
   return async (request, env, ctx) => {
     const response = await handler(request, env, ctx)
     const { searchParams } = new URL(request.url)
-    const fileName = searchParams.get('filename')
-    const download = searchParams.get('download')
-    if (fileName && download) {
-      response.headers.set('Content-Disposition', `attachment; filename="${fileName}"`)
-    } else if (download) {
-      response.headers.set('Content-Disposition', 'attachment')
-    } else if (fileName) {
-      response.headers.set('Content-Disposition', `inline; filename="${fileName}"`)
+    if (!response.headers.has('Content-Disposition')) {
+      const fileName = searchParams.get('filename')
+      const download = searchParams.get('download')
+      if (fileName && download) {
+        response.headers.set('Content-Disposition', `attachment; filename="${fileName}"`)
+      } else if (download) {
+        response.headers.set('Content-Disposition', 'attachment')
+      } else if (fileName) {
+        response.headers.set('Content-Disposition', `inline; filename="${fileName}"`)
+      }
     }
-
     return response
   }
 }
