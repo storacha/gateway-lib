@@ -177,6 +177,10 @@ export function withCdnCache (handler) {
     if ((request.headers.get('Cache-Control') || '').includes('no-cache')) {
       return handler(request, env, ctx)
     }
+    // Can only cache GET requestz
+    if (request.method !== 'GET') {
+      return handler(request, env, ctx)
+    }
 
     let response
     // Get from cache and return if existent
