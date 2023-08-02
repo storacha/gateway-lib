@@ -1,5 +1,17 @@
 # Changelog
 
+## [3.4.0](https://github.com/web3-storage/gateway-lib/compare/v3.3.3...v3.4.0) (2023-08-02)
+
+
+### Features
+
+* support blake2b hashes ([9bd7d5d](https://github.com/web3-storage/gateway-lib/commit/9bd7d5d3487f4338f07c9f01ddfad8abc8d88652))
+
+
+### Bug Fixes
+
+* specify that Accept header varies response ([15b55c4](https://github.com/web3-storage/gateway-lib/commit/15b55c4860646d5b8e2da2eedcb6475206562f30))
+
 ## [3.3.3](https://github.com/web3-storage/gateway-lib/compare/v3.3.2...v3.3.3) (2023-08-02)
 
 
