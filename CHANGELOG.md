@@ -1,5 +1,13 @@
 # Changelog
 
+## [3.3.3](https://github.com/web3-storage/gateway-lib/compare/v3.3.2...v3.3.3) (2023-08-02)
+
+
+### Bug Fixes
+
+* block yield for unknown hash ([856181f](https://github.com/web3-storage/gateway-lib/commit/856181fe42127a2ff456b718b3e7d04cc2c2abb9))
+* unixfs type inconsistency ([0c3bc4f](https://github.com/web3-storage/gateway-lib/commit/0c3bc4fba2a511308870e6b5545b1bd7dad31355))
+
 ## [3.3.2](https://github.com/web3-storage/gateway-lib/compare/v3.3.1...v3.3.2) (2023-07-24)
 
 
