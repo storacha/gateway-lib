@@ -62,7 +62,8 @@ export async function handleCar (request, env, ctx) {
     'X-Content-Type-Options': 'nosniff',
     Etag: etag,
     'Cache-Control': 'public, max-age=29030400, immutable',
-    'Content-Disposition': `attachment; filename="${asciiName}"; filename*=UTF-8''${utf8Name}`
+    'Content-Disposition': `attachment; filename="${asciiName}"; filename*=UTF-8''${utf8Name}`,
+    Vary: 'Accept'
   }
 
   return new Response(toReadableStream(out), { headers })

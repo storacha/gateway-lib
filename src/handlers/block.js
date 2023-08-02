@@ -39,7 +39,8 @@ export async function handleBlock (request, env, ctx) {
     Etag: etag,
     'Cache-Control': 'public, max-age=29030400, immutable',
     'Content-Length': block.bytes.length.toString(),
-    'Content-Disposition': `attachment; filename="${asciiName}"; filename*=UTF-8''${utf8Name}`
+    'Content-Disposition': `attachment; filename="${asciiName}"; filename*=UTF-8''${utf8Name}`,
+    Vary: 'Accept'
   }
 
   return new Response(block.bytes, { headers })
