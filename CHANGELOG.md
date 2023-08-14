@@ -1,5 +1,12 @@
 # Changelog
 
+## [3.4.1](https://github.com/web3-storage/gateway-lib/compare/v3.4.0...v3.4.1) (2023-08-14)
+
+
+### Bug Fixes
+
+* dfs block retrieval ordering ([8974cd4](https://github.com/web3-storage/gateway-lib/commit/8974cd4852381dc41a78cadce48118b4cc9428c3))
+
 ## [3.4.0](https://github.com/web3-storage/gateway-lib/compare/v3.3.3...v3.4.0) (2023-08-02)
 
 
