@@ -202,15 +202,8 @@ export function withCdnCache (handler) {
     // cache the repsonse if success status
     if (response.ok && !response.headers.has('Content-Range')) {
       const contentLength = response.headers.get('Content-Length')
-      if (contentLength) {
-        if (parseInt(contentLength) < CF_CACHE_MAX_OBJECT_SIZE) {
-          ctx.waitUntil(cache.put(request, response.clone()))
-        }
-      } else {
-        // If no content length (a directory or non-unixfs for example) then
-        // try to cache anyway, chances are that total response size will be
-        // less than CF_CACHE_MAX_OBJECT_SIZE anyways.
-        ctx.waitUntil(cache.put(request, response.clone()).catch(() => {}))
+      if (contentLength && parseInt(contentLength) < CF_CACHE_MAX_OBJECT_SIZE) {
+        ctx.waitUntil(cache.put(request, response.clone()))
       }
     }
 
