@@ -1,5 +1,12 @@
 # Changelog
 
+## [3.4.2](https://github.com/web3-storage/gateway-lib/compare/v3.4.1...v3.4.2) (2023-08-15)
+
+
+### Bug Fixes
+
+* revert cache content of unknown size ([caef58a](https://github.com/web3-storage/gateway-lib/commit/caef58ad8c54fe6a8615be82d8f90b504232a3a0))
+
 ## [3.4.1](https://github.com/web3-storage/gateway-lib/compare/v3.4.0...v3.4.1) (2023-08-14)
 
 
