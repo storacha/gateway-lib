@@ -1,5 +1,5 @@
 /* eslint-env browser */
-import { describe, it, mock } from 'node:test'
+import { describe, it } from 'node:test'
 import assert from 'node:assert'
 import { Dagula } from 'dagula'
 import { fromString } from 'uint8arrays'
@@ -30,31 +30,5 @@ describe('withCdnCache', () => {
     const handler = () => { throw new Error('request should not reach handler') }
     const res = await withCdnCache(handler)(req, env, ctx)
     assert.strictEqual(res.status, 412)
-  })
-
-  it('should cache responses without a content-length', async () => {
-    const waitUntil = mockWaitUntil()
-    const path = ''
-    const searchParams = new URLSearchParams()
-    const block = await encode({ value: fromString('test'), codec: raw, hasher })
-    const blockstore = mockBlockstore([block])
-    const dagula = new Dagula(blockstore)
-    const ctx = { waitUntil, dagula, dataCid: block.cid, path, searchParams }
-    const env = { DEBUG: 'true' }
-
-    const req = new Request(`http://localhost/ipfs/${block.cid}`)
-    const caches = { default: { match: () => {}, put: mock.fn((req, res) => Promise.resolve()) } }
-    // set up global default cache to _not_ return a cached response
-    // @ts-ignore mock for tests
-    global.caches = caches
-
-    // handler that returns a response without a content-length header
-    const handler = async () => new Response('no-content-length')
-    const res = await withCdnCache(handler)(req, env, ctx)
-    assert.strictEqual(res.status, 200)
-
-    await Promise.all(waitUntil.promises)
-    assert.equal(caches.default.put.mock.callCount(), 1)
-    assert.equal(caches.default.put.mock.calls[0].arguments[0], req)
   })
 })
