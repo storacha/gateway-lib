@@ -1,5 +1,12 @@
 # Changelog
 
+## [3.4.3](https://github.com/web3-storage/gateway-lib/compare/v3.4.2...v3.4.3) (2023-08-22)
+
+
+### Bug Fixes
+
+* update dependencies ([1cc1d1d](https://github.com/web3-storage/gateway-lib/commit/1cc1d1ddc344506332b8b67093b4dfe08871f738))
+
 ## [3.4.2](https://github.com/web3-storage/gateway-lib/compare/v3.4.1...v3.4.2) (2023-08-15)
 
 
