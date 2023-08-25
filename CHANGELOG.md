@@ -1,5 +1,12 @@
 # Changelog
 
+## [3.5.0](https://github.com/web3-storage/gateway-lib/compare/v3.4.3...v3.5.0) (2023-08-25)
+
+
+### Features
+
+* support entity-bytes for CAR requests ([21e3f8f](https://github.com/web3-storage/gateway-lib/commit/21e3f8ff9e819e88f8a62601712cafcc9eeb1e8c))
+
 ## [3.4.3](https://github.com/web3-storage/gateway-lib/compare/v3.4.2...v3.4.3) (2023-08-22)
 
 
