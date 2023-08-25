@@ -20,6 +20,7 @@ export async function handleCar (request, env, ctx) {
   if (!dagula) throw new Error('missing dagula instance')
 
   const dagScope = getDagScope(searchParams)
+  const entityBytes = getEntityBytes(searchParams)
   const { version, order, dups } = getAcceptParams(request.headers)
 
   // Use root CID for etag even tho we may resolve a different root for the terminus of the path
@@ -39,7 +40,7 @@ export async function handleCar (request, env, ctx) {
   const { writer, out } = CarWriter.create(dataCid)
   ;(async () => {
     try {
-      for await (const block of dagula.getPath(`${dataCid}${path}`, { dagScope, order, signal: controller?.signal })) {
+      for await (const block of dagula.getPath(`${dataCid}${path}`, { dagScope, entityBytes, order, signal: controller?.signal })) {
         // @ts-expect-error
         await writer.put(block)
       }
@@ -79,6 +80,35 @@ function getDagScope (searchParams) {
     return scope
   }
   throw new HttpError(`unsupported dag-scope: ${scope}`, { status: 400 })
+}
+
+/**
+ * @param {URLSearchParams} searchParams
+ * @returns {import('dagula').ByteRange|undefined}
+ */
+function getEntityBytes (searchParams) {
+  const value = searchParams.get('entity-bytes')
+  if (!value) return
+
+  const parts = value.split(':')
+  if (parts.length !== 2) {
+    throw new HttpError(`invalid entity-bytes: ${value}`, { status: 400 })
+  }
+  const from = parseInt(parts[0])
+  if (isNaN(from)) {
+    throw new HttpError(`invalid entity-bytes: ${value}`, { status: 400 })
+  }
+  /** @type {number|'*'} */
+  let to
+  if (parts[1] === '*') {
+    to = parts[1]
+  } else {
+    to = parseInt(parts[1])
+    if (isNaN(to)) {
+      throw new HttpError(`invalid entity-bytes: ${value}`, { status: 400 })
+    }
+  }
+  return { from, to }
 }
 
 /**
