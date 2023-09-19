@@ -1,5 +1,12 @@
 # Changelog
 
+## [3.5.1](https://github.com/web3-storage/gateway-lib/compare/v3.5.0...v3.5.1) (2023-09-19)
+
+
+### Bug Fixes
+
+* dfs block ordering ([914bd02](https://github.com/web3-storage/gateway-lib/commit/914bd022ff85db46f0db4eca67d47b30cbc46eef))
+
 ## [3.5.0](https://github.com/web3-storage/gateway-lib/compare/v3.4.3...v3.5.0) (2023-08-25)
 
 
