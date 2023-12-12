@@ -2,9 +2,10 @@
 import { fromString } from 'uint8arrays/from-string'
 import Handlebars from '@web3-storage/handlebars/runtime.js'
 import bytes from 'bytes'
-import './templates/bundle.cjs'
 import { toReadableStream } from '../util/streams.js'
 import { handleUnixfsFile } from './unixfs-file.js'
+
+await import('./templates/bundle.cjs')
 
 /**
  * @typedef {import('../bindings.js').UnixfsEntryContext & import('../bindings.js').IpfsUrlContext & import('../bindings.js').DagulaContext & { timeoutController?: import('../bindings.js').TimeoutControllerContext['timeoutController'] }} UnixfsDirectoryHandlerContext
