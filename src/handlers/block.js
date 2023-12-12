@@ -1,10 +1,10 @@
 /* eslint-env browser */
 
 /**
- * @typedef {import('../bindings').IpfsUrlContext & import('../bindings').DagulaContext & { timeoutController?: import('../bindings').TimeoutControllerContext['timeoutController'] }} BlockHandlerContext
+ * @typedef {import('../bindings.js').IpfsUrlContext & import('../bindings.js').DagulaContext & { timeoutController?: import('../bindings.js').TimeoutControllerContext['timeoutController'] }} BlockHandlerContext
  */
 
-/** @type {import('../bindings').Handler<BlockHandlerContext>} */
+/** @type {import('../bindings.js').Handler<BlockHandlerContext>} */
 export async function handleBlock (request, env, ctx) {
   const { dataCid, path, timeoutController: controller, dagula } = ctx
   if (!dataCid) throw new Error('missing IPFS path')
