@@ -1,5 +1,16 @@
 # Changelog
 
+## [4.0.0](https://github.com/web3-storage/gateway-lib/compare/v3.5.1...v4.0.0) (2023-12-12)
+
+
+### ⚠ BREAKING CHANGES
+
+* tsconfig.json uses module=NodeNext ([#52](https://github.com/web3-storage/gateway-lib/issues/52))
+
+### Features
+
+* tsconfig.json uses module=NodeNext ([#52](https://github.com/web3-storage/gateway-lib/issues/52)) ([443bd58](https://github.com/web3-storage/gateway-lib/commit/443bd58f196cc7f7b23999fc57a9d74d6b327be9))
+
 ## [3.5.1](https://github.com/web3-storage/gateway-lib/compare/v3.5.0...v3.5.1) (2023-09-19)
 
 
