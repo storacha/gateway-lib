@@ -7,7 +7,7 @@ import { toReadableStream } from '../util/streams.js'
 import { handleUnixfsFile } from './unixfs-file.js'
 
 /**
- * @typedef {import('../bindings').UnixfsEntryContext & import('../bindings').IpfsUrlContext & import('../bindings').DagulaContext & { timeoutController?: import('../bindings').TimeoutControllerContext['timeoutController'] }} UnixfsDirectoryHandlerContext
+ * @typedef {import('../bindings.js').UnixfsEntryContext & import('../bindings.js').IpfsUrlContext & import('../bindings.js').DagulaContext & { timeoutController?: import('../bindings.js').TimeoutControllerContext['timeoutController'] }} UnixfsDirectoryHandlerContext
  */
 
 /**
@@ -42,7 +42,7 @@ const knownIcons = Object.fromEntries([
   'tga', 'tgz', 'tiff', 'txt', 'wav', 'wmv', 'xls', 'xlsx', 'xml', 'yml', 'zip'
 ].map(ext => [ext, true]))
 
-/** @type {import('../bindings').Handler<UnixfsDirectoryHandlerContext>} */
+/** @type {import('../bindings.js').Handler<UnixfsDirectoryHandlerContext>} */
 export async function handleUnixfsDir (request, env, ctx) {
   const { unixfsEntry: entry, timeoutController: controller, dagula, dataCid, path } = ctx
   if (!entry) throw new Error('missing unixfs entry')

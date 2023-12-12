@@ -4,7 +4,7 @@ import { toReadableStream } from '../util/streams.js'
 import { HttpError } from '../util/errors.js'
 
 /**
- * @typedef {import('../bindings').IpfsUrlContext & import('../bindings').DagulaContext  & { timeoutController?: import('../bindings').TimeoutControllerContext['timeoutController'] }} CarHandlerContext
+ * @typedef {import('../bindings.js').IpfsUrlContext & import('../bindings.js').DagulaContext  & { timeoutController?: import('../bindings.js').TimeoutControllerContext['timeoutController'] }} CarHandlerContext
  * @typedef {import('multiformats').CID} CID
  * @typedef {{ version: 1|2, order: import('dagula').BlockOrder, dups: boolean }} CarParams
  */
@@ -12,7 +12,7 @@ import { HttpError } from '../util/errors.js'
 /** @type {CarParams} */
 const DefaultCarParams = { version: 1, order: 'unk', dups: true }
 
-/** @type {import('../bindings').Handler<CarHandlerContext>} */
+/** @type {import('../bindings.js').Handler<CarHandlerContext>} */
 export async function handleCar (request, env, ctx) {
   const { dataCid, path, timeoutController: controller, dagula, searchParams } = ctx
   if (!dataCid) throw new Error('missing IPFS path')
@@ -41,7 +41,6 @@ export async function handleCar (request, env, ctx) {
   ;(async () => {
     try {
       for await (const block of dagula.getPath(`${dataCid}${path}`, { dagScope, entityBytes, order, signal: controller?.signal })) {
-        // @ts-expect-error
         await writer.put(block)
       }
     } catch (/** @type {any} */ err) {
