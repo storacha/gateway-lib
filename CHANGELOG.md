@@ -1,5 +1,12 @@
 # Changelog
 
+## [4.1.0](https://github.com/web3-storage/gateway-lib/compare/v4.0.0...v4.1.0) (2023-12-13)
+
+
+### Features
+
+* fix exports[].types in package.json ([#54](https://github.com/web3-storage/gateway-lib/issues/54)) ([a3c098b](https://github.com/web3-storage/gateway-lib/commit/a3c098be8519cedd897898cf915c7db796df1fef))
+
 ## [4.0.0](https://github.com/web3-storage/gateway-lib/compare/v3.5.1...v4.0.0) (2023-12-12)
 
 
