@@ -48,6 +48,7 @@
     }
   },
   "scripts": {
+    "prepare": "npm run build:templates",
     "test": "node --test test/**/*.spec.js",
     "lint": "standard",
     "build": "npm run build:types && npm run build:templates",
