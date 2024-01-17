@@ -36,7 +36,7 @@ function detectTextContent (bytes, defaultMime = 'text/plain') {
   const encoding = chardet.detect(bytes)
   if (!encoding) return
   let mime = defaultMime
-  if (encoding === 'UTF-8' || encoding === 'ISO-8859-1') {
+  if (encoding === 'UTF-8' || encoding === 'ISO-8859-1' || encoding === 'ASCII') {
     const text = toString(bytes).toLowerCase()
     if (text.startsWith('<!doctype html')) {
       mime = 'text/html'

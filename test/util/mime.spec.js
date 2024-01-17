@@ -8,7 +8,7 @@ describe('mime', () => {
     const str = '<?xml version="1.0" encoding="UTF-8" standalone="no"?><root></root>'
     const bytes = new TextEncoder().encode(str)
     assert.equal(detectContentType('test.xml', bytes), 'application/xml')
-    assert.equal(detectContentType(undefined, bytes), 'application/xml; charset=ISO-8859-1')
+    assert.equal(detectContentType(undefined, bytes), 'application/xml; charset=ASCII')
   })
 
   it('should return svg for an svg file with xml declaration', () => {
@@ -16,7 +16,7 @@ describe('mime', () => {
     const str = '<?xml version="1.0" encoding="UTF-8" standalone="no"?><svg></svg>'
     const bytes = new TextEncoder().encode(str)
     assert.equal(detectContentType('test.svg', bytes), 'image/svg+xml')
-    assert.equal(detectContentType(undefined, bytes), 'image/svg+xml; charset=ISO-8859-1')
+    assert.equal(detectContentType(undefined, bytes), 'image/svg+xml; charset=ASCII')
   })
 
   it('should return svg for a file with an svg element as root', () => {
@@ -26,7 +26,7 @@ describe('mime', () => {
     assert.equal(detectContentType('test.svg', bytes), 'image/svg+xml')
     // Note: chardet uses byte occurance statistics to guess char encoding. This short string tips in favour of UTF-8.
     // see: https://github.com/runk/node-chardet/blob/master/src/index.ts#L52-L53
-    assert.equal(detectContentType(undefined, bytes), 'image/svg+xml; charset=UTF-8')
+    assert.equal(detectContentType(undefined, bytes), 'image/svg+xml; charset=ASCII')
   })
 
   it('should return html for an html file', () => {
@@ -34,6 +34,6 @@ describe('mime', () => {
     const str = '<!DOCTYPE html><svg></svg>'
     const bytes = new TextEncoder().encode(str)
     assert.equal(detectContentType('test.html', bytes), 'text/html')
-    assert.equal(detectContentType(undefined, bytes), 'text/html; charset=ISO-8859-1')
+    assert.equal(detectContentType(undefined, bytes), 'text/html; charset=ASCII')
   })
 })
