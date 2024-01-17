@@ -1,5 +1,12 @@
 # Changelog
 
+## [4.1.1](https://github.com/web3-storage/gateway-lib/compare/v4.1.0...v4.1.1) (2024-01-17)
+
+
+### Bug Fixes
+
+* allow dag-json traversal ([ebc4f5e](https://github.com/web3-storage/gateway-lib/commit/ebc4f5e6c52f960ed96ed1fb4f757fdeb275f01b))
+
 ## [4.1.0](https://github.com/web3-storage/gateway-lib/compare/v4.0.0...v4.1.0) (2023-12-13)
 
 
