@@ -1,5 +1,30 @@
 # Changelog
 
+## [4.1.0](https://github.com/web3-storage/gateway-lib/compare/v4.0.0...v4.1.0) (2023-12-13)
+
+
+### Features
+
+* fix exports[].types in package.json ([#54](https://github.com/web3-storage/gateway-lib/issues/54)) ([a3c098b](https://github.com/web3-storage/gateway-lib/commit/a3c098be8519cedd897898cf915c7db796df1fef))
+
+## [4.0.0](https://github.com/web3-storage/gateway-lib/compare/v3.5.1...v4.0.0) (2023-12-12)
+
+
+### ⚠ BREAKING CHANGES
+
+* tsconfig.json uses module=NodeNext ([#52](https://github.com/web3-storage/gateway-lib/issues/52))
+
+### Features
+
+* tsconfig.json uses module=NodeNext ([#52](https://github.com/web3-storage/gateway-lib/issues/52)) ([443bd58](https://github.com/web3-storage/gateway-lib/commit/443bd58f196cc7f7b23999fc57a9d74d6b327be9))
+
+## [3.5.1](https://github.com/web3-storage/gateway-lib/compare/v3.5.0...v3.5.1) (2023-09-19)
+
+
+### Bug Fixes
+
+* dfs block ordering ([914bd02](https://github.com/web3-storage/gateway-lib/commit/914bd022ff85db46f0db4eca67d47b30cbc46eef))
+
 ## [3.5.0](https://github.com/web3-storage/gateway-lib/compare/v3.4.3...v3.5.0) (2023-08-25)
 
 

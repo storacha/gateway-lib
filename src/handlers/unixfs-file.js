@@ -3,10 +3,10 @@ import { toReadableStream } from '../util/streams.js'
 import { detectContentType } from '../util/mime.js'
 
 /**
- * @typedef {import('../bindings').UnixfsEntryContext} UnixfsFileHandlerContext
+ * @typedef {import('../bindings.js').UnixfsEntryContext} UnixfsFileHandlerContext
  */
 
-/** @type {import('../bindings').Handler<UnixfsFileHandlerContext>} */
+/** @type {import('../bindings.js').Handler<UnixfsFileHandlerContext>} */
 export async function handleUnixfsFile (request, env, ctx) {
   const { unixfsEntry: entry } = ctx
   if (!entry) throw new Error('missing unixfs entry')

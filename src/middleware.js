@@ -4,7 +4,7 @@ import { TimeoutController } from 'timeout-abort-controller'
 import { HttpError } from './util/errors.js'
 import { parseCid, tryParseCid } from './util/cid.js'
 
-/** @typedef {import('./bindings').Context} Context */
+/** @typedef {import('./bindings.js').Context} Context */
 
 const CF_CACHE_MAX_OBJECT_SIZE = 512 * Math.pow(1024, 2) // 512MB to bytes
 
@@ -17,7 +17,7 @@ const CF_CACHE_MAX_OBJECT_SIZE = 512 * Math.pow(1024, 2) // 512MB to bytes
  * Some properties in the original context object are not enumerable so need
  * to be expicitly added.
  *
- * @type {import('./bindings').Middleware<Context>}
+ * @type {import('./bindings.js').Middleware<Context>}
  */
 export function withContext (handler) {
   return (request, env, ctx) => {
@@ -28,7 +28,7 @@ export function withContext (handler) {
 
 /**
  * Adds CORS headers to the response.
- * @type {import('./bindings').Middleware<Context>}
+ * @type {import('./bindings.js').Middleware<Context>}
  */
 export function withCorsHeaders (handler) {
   return async (request, env, ctx) => {
@@ -52,7 +52,7 @@ export function withCorsHeaders (handler) {
 /**
  * Adds Content Disposition header to the response according to the request.
  * https://github.com/ipfs/specs/blob/main/http-gateways/PATH_GATEWAY.md#request-query-parameters
- * @type {import('./bindings').Middleware<Context>}
+ * @type {import('./bindings.js').Middleware<Context>}
  */
 export function withContentDispositionHeader (handler) {
   return async (request, env, ctx) => {
@@ -75,7 +75,7 @@ export function withContentDispositionHeader (handler) {
 
 /**
  * Catches any errors, logs them and returns a suitable response.
- * @type {import('./bindings').Middleware<Context>}
+ * @type {import('./bindings.js').Middleware<Context>}
  */
 export function withErrorHandler (handler) {
   return async (request, env, ctx) => {
@@ -93,7 +93,7 @@ export function withErrorHandler (handler) {
 
 /**
  * Validates the request uses a HTTP GET method.
- * @type {import('./bindings').Middleware<Context>}
+ * @type {import('./bindings.js').Middleware<Context>}
  */
 export function withHttpGet (handler) {
   return (request, env, ctx) => {
@@ -106,7 +106,7 @@ export function withHttpGet (handler) {
 
 /**
  * Extracts the data CID, the path and search params from the URL.
- * @type {import('./bindings').Middleware<import('./bindings').IpfsUrlContext>}
+ * @type {import('./bindings.js').Middleware<import('./bindings.js').IpfsUrlContext>}
  */
 export function withParsedIpfsUrl (handler) {
   return (request, env, ctx) => {
@@ -144,7 +144,7 @@ export function withParsedIpfsUrl (handler) {
  * @param {number} timeout Timeout in milliseconds.
  */
 export function createWithTimeoutController (timeout) {
-  /** @type {import('./bindings').Middleware<import('./bindings').TimeoutControllerContext>} */
+  /** @type {import('./bindings.js').Middleware<import('./bindings.js').TimeoutControllerContext>} */
   return handler => {
     return async (request, env, ctx) => {
       const timeoutController = new TimeoutController(timeout)
@@ -169,7 +169,7 @@ export function createWithTimeoutController (timeout) {
 /**
  * Intercepts request if content cached by just returning cached response.
  * Otherwise proceeds to handler.
- * @type {import('./bindings').Middleware<Context>}
+ * @type {import('./bindings.js').Middleware<Context>}
  */
 export function withCdnCache (handler) {
   return async (request, env, ctx) => {
@@ -215,7 +215,7 @@ export function withCdnCache (handler) {
  * Pipes reponse through a FixedLengthStream if `Content-Length` header is set.
  * https://developers.cloudflare.com/workers/runtime-apis/streams/transformstream/#fixedlengthstream
  *
- * @type {import('./bindings').Middleware<Context>}
+ * @type {import('./bindings.js').Middleware<Context>}
  */
 export function withFixedLengthStream (handler) {
   return async (request, env, ctx) => {
@@ -234,8 +234,8 @@ export function withFixedLengthStream (handler) {
 }
 
 /**
- * @param {...import('./bindings').Middleware<any, any, any>} middlewares
- * @returns {import('./bindings').Middleware<any, any, any>}
+ * @param {...import('./bindings.js').Middleware<any, any, any>} middlewares
+ * @returns {import('./bindings.js').Middleware<any, any, any>}
  */
 export function composeMiddleware (...middlewares) {
   return handler => middlewares.reduceRight((h, m) => m(h), handler)
