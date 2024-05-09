@@ -92,17 +92,26 @@ export function withErrorHandler (handler) {
 }
 
 /**
+ * Validates the request uses a specific HTTP method(s).
+ * @param {...string} method Allowed HTTP method(s).
+ * @returns {import('./bindings.js').Middleware<Context>}
+ */
+export function createWithHttpMethod (...method) {
+  return (handler) => {
+    return (request, env, ctx) => {
+      if (!method.includes(request.method)) {
+        throw new HttpError('method not allowed', { status: 405 })
+      }
+      return handler(request, env, ctx)
+    }
+  }
+}
+
+/**
  * Validates the request uses a HTTP GET method.
  * @type {import('./bindings.js').Middleware<Context>}
  */
-export function withHttpGet (handler) {
-  return (request, env, ctx) => {
-    if (request.method !== 'GET') {
-      throw Object.assign(new Error('method not allowed'), { status: 405 })
-    }
-    return handler(request, env, ctx)
-  }
-}
+export const withHttpGet = createWithHttpMethod('GET')
 
 /**
  * Extracts the data CID, the path and search params from the URL.

@@ -1,6 +1,7 @@
 /* eslint-env browser */
 import { toReadableStream } from '../util/streams.js'
 import { detectContentType } from '../util/mime.js'
+import { HttpError } from '../util/errors.js'
 
 /**
  * @typedef {import('../bindings.js').UnixfsEntryContext} UnixfsFileHandlerContext
@@ -9,9 +10,9 @@ import { detectContentType } from '../util/mime.js'
 /** @type {import('../bindings.js').Handler<UnixfsFileHandlerContext>} */
 export async function handleUnixfsFile (request, env, ctx) {
   const { unixfsEntry: entry } = ctx
-  if (!entry) throw new Error('missing unixfs entry')
+  if (!entry) throw new Error('missing UnixFS entry')
   if (entry.type !== 'file' && entry.type !== 'raw' && entry.type !== 'identity') {
-    throw new Error('non unixfs file entry')
+    throw new Error('non UnixFS file entry')
   }
 
   const etag = `"${entry.cid}"`
@@ -24,6 +25,13 @@ export async function handleUnixfsFile (request, env, ctx) {
     Etag: etag,
     'Cache-Control': 'public, max-age=29030400, immutable',
     'Content-Length': entry.size.toString()
+  }
+
+  if (request.method === 'HEAD') {
+    return new Response(null, { headers })
+  }
+  if (request.method !== 'GET') {
+    throw new HttpError('method not allowed', { status: 405 })
   }
 
   console.log('unixfs root', entry.cid.toString())

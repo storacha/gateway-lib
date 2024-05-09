@@ -5,9 +5,10 @@ import bytes from 'bytes'
 import './templates/bundle.cjs'
 import { toReadableStream } from '../util/streams.js'
 import { handleUnixfsFile } from './unixfs-file.js'
+import { HttpError } from '../util/errors.js'
 
 /**
- * @typedef {import('../bindings.js').UnixfsEntryContext & import('../bindings.js').IpfsUrlContext & import('../bindings.js').DagulaContext & { timeoutController?: import('../bindings.js').TimeoutControllerContext['timeoutController'] }} UnixfsDirectoryHandlerContext
+ * @typedef {import('../bindings.js').UnixfsEntryContext & import('../bindings.js').IpfsUrlContext & import('../bindings.js').UnixfsContext & { timeoutController?: import('../bindings.js').TimeoutControllerContext['timeoutController'] }} UnixfsDirectoryHandlerContext
  */
 
 /**
@@ -44,15 +45,15 @@ const knownIcons = Object.fromEntries([
 
 /** @type {import('../bindings.js').Handler<UnixfsDirectoryHandlerContext>} */
 export async function handleUnixfsDir (request, env, ctx) {
-  const { unixfsEntry: entry, timeoutController: controller, dagula, dataCid, path } = ctx
-  if (!entry) throw new Error('missing unixfs entry')
-  if (!entry.type.includes('directory')) throw new Error('non unixfs directory entry')
-  if (!dagula) throw new Error('missing dagula instance')
+  const { unixfsEntry: entry, timeoutController: controller, unixfs, dataCid, path } = ctx
+  if (!entry) throw new Error('missing UnixFS entry')
+  if (!entry.type.includes('directory')) throw new Error('non UnixFS directory entry')
+  if (!unixfs) throw new Error('missing UnixFS service')
 
   // serve index.html if directory contains one
   try {
     const indexPath = `${dataCid}${path}${path.endsWith('/') ? '' : '/'}index.html`
-    const fileEntry = await dagula.getUnixfs(indexPath, { signal: controller?.signal })
+    const fileEntry = await unixfs.getUnixfs(indexPath, { signal: controller?.signal })
     ctx.unixfsEntry = fileEntry
     return handleUnixfsFile(request, env, ctx)
   } catch (/** @type {any} */ err) {
@@ -66,6 +67,9 @@ export async function handleUnixfsDir (request, env, ctx) {
 
   if (request.method === 'HEAD') {
     return new Response(null, { headers })
+  }
+  if (request.method !== 'GET') {
+    throw new HttpError('method not allowed', { status: 405 })
   }
 
   const isSubdomain = new URL(request.url).hostname.includes('.ipfs.')

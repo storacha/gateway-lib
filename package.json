@@ -65,6 +65,7 @@
   "author": "Alan Shaw",
   "license": "Apache-2.0 OR MIT",
   "dependencies": {
+    "@httpland/range-parser": "^1.2.0",
     "@ipld/car": "^5.2.6",
     "@web3-storage/handlebars": "^1.0.0",
     "bytes": "^3.1.2",
@@ -73,6 +74,7 @@
     "magic-bytes.js": "^1.8.0",
     "mrmime": "^1.0.1",
     "multiformats": "^13.0.1",
+    "multipart-byte-range": "^2.0.1",
     "timeout-abort-controller": "^3.0.0",
     "uint8arrays": "^5.0.1"
   },

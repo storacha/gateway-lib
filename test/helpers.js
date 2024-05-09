@@ -1,3 +1,5 @@
+import { resolveRange } from '../src/util/range.js'
+
 /**
  * @returns {((p: Promise<any>) => void) & { promises: Promise<unknown>[] }}
  */
@@ -14,5 +16,24 @@ export const mockWaitUntil = () => {
  * @returns {import('dagula').Blockstore}
  */
 export const mockBlockstore = blocks => ({
-  get: async cid => blocks.find(b => b.cid.toString() === cid.toString())
+  async get (cid) {
+    return blocks.find(b => b.cid.toString() === cid.toString())
+  },
+  async stream (cid, options) {
+    const block = await this.get(cid)
+    if (!block) return
+    return new ReadableStream({
+      pull (controller) {
+        const range = resolveRange(options?.range ?? [0], block.bytes.length)
+        const bytes = block.bytes.slice(range[0], range[1] + 1)
+        controller.enqueue(bytes)
+        controller.close()
+      }
+    })
+  },
+  async stat (cid) {
+    const block = await this.get(cid)
+    if (!block) return
+    return { size: block.bytes.length }
+  }
 })

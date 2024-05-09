@@ -4,7 +4,7 @@ import { toReadableStream } from '../util/streams.js'
 import { HttpError } from '../util/errors.js'
 
 /**
- * @typedef {import('../bindings.js').IpfsUrlContext & import('../bindings.js').DagulaContext  & { timeoutController?: import('../bindings.js').TimeoutControllerContext['timeoutController'] }} CarHandlerContext
+ * @typedef {import('../bindings.js').IpfsUrlContext & import('../bindings.js').DagContext  & { timeoutController?: import('../bindings.js').TimeoutControllerContext['timeoutController'] }} CarHandlerContext
  * @typedef {import('multiformats').CID} CID
  * @typedef {{ version: 1|2, order: import('dagula').BlockOrder, dups: boolean }} CarParams
  */
@@ -14,10 +14,14 @@ const DefaultCarParams = { version: 1, order: 'unk', dups: true }
 
 /** @type {import('../bindings.js').Handler<CarHandlerContext>} */
 export async function handleCar (request, env, ctx) {
-  const { dataCid, path, timeoutController: controller, dagula, searchParams } = ctx
+  const { dataCid, path, timeoutController: controller, dag, searchParams } = ctx
   if (!dataCid) throw new Error('missing IPFS path')
   if (path == null) throw new Error('missing URL path')
-  if (!dagula) throw new Error('missing dagula instance')
+  if (!dag) throw new Error('missing DAG service')
+
+  if (request.method !== 'GET') {
+    throw new HttpError('method not allowed', { status: 405 })
+  }
 
   const dagScope = getDagScope(searchParams)
   const entityBytes = getEntityBytes(searchParams)
@@ -40,7 +44,7 @@ export async function handleCar (request, env, ctx) {
   const { writer, out } = CarWriter.create(dataCid)
   ;(async () => {
     try {
-      for await (const block of dagula.getPath(`${dataCid}${path}`, { dagScope, entityBytes, order, signal: controller?.signal })) {
+      for await (const block of dag.getPath(`${dataCid}${path}`, { dagScope, entityBytes, order, signal: controller?.signal })) {
         await writer.put(block)
       }
     } catch (/** @type {any} */ err) {
@@ -83,7 +87,7 @@ function getDagScope (searchParams) {
 
 /**
  * @param {URLSearchParams} searchParams
- * @returns {import('dagula').ByteRange|undefined}
+ * @returns {import('dagula').Range|undefined}
  */
 function getEntityBytes (searchParams) {
   const value = searchParams.get('entity-bytes')
@@ -97,17 +101,15 @@ function getEntityBytes (searchParams) {
   if (isNaN(from)) {
     throw new HttpError(`invalid entity-bytes: ${value}`, { status: 400 })
   }
-  /** @type {number|'*'} */
+  /** @type {number|undefined} */
   let to
-  if (parts[1] === '*') {
-    to = parts[1]
-  } else {
+  if (parts[1] !== '*') {
     to = parseInt(parts[1])
     if (isNaN(to)) {
       throw new HttpError(`invalid entity-bytes: ${value}`, { status: 400 })
     }
   }
-  return { from, to }
+  return to ? [from, to] : [from]
 }
 
 /**
