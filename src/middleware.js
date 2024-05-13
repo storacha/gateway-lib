@@ -208,8 +208,8 @@ export function withCdnCache (handler) {
 
     response = await handler(request, env, ctx)
 
-    // cache the repsonse if success status
-    if (response.ok && !response.headers.has('Content-Range')) {
+    // cache the repsonse if success status, and not range request
+    if (response.ok && response.status !== 206) {
       const contentLength = response.headers.get('Content-Length')
       if (contentLength && parseInt(contentLength) < CF_CACHE_MAX_OBJECT_SIZE) {
         ctx.waitUntil(cache.put(request, response.clone()))

@@ -88,14 +88,18 @@ export async function handleBlock (request, env, ctx) {
 const handleRange = async (blocks, cid, range, options) => {
   const stat = await blocks.statBlock(cid, { signal: options?.signal })
   const [first, last] = resolveRange(range, stat.size)
-  const contentRange = `bytes ${first}-${last}/${stat.size}`
   const contentLength = last - first + 1
 
+  /** @type {Record<string, string>} */
   const headers = {
     ...options?.headers,
     'Content-Type': 'application/vnd.ipld.raw',
-    'Content-Range': contentRange,
     'Content-Length': String(contentLength)
+  }
+
+  if (stat.size !== contentLength) {
+    const contentRange = `bytes ${first}-${last}/${stat.size}`
+    headers['Content-Range'] = contentRange
   }
 
   const status = stat.size === contentLength ? 200 : 206
