@@ -70,7 +70,7 @@
     "@web3-storage/handlebars": "^1.0.0",
     "bytes": "^3.1.2",
     "chardet": "^2.0.0",
-    "dagula": "^7.3.0",
+    "dagula": "github:web3-storage/dagula#feat/add-block-streaming-interface",
     "magic-bytes.js": "^1.8.0",
     "mrmime": "^1.0.1",
     "multiformats": "^13.0.1",
