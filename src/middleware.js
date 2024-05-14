@@ -7,6 +7,7 @@ import { parseCid, tryParseCid } from './util/cid.js'
 /** @typedef {import('./bindings.js').Context} Context */
 
 const CF_CACHE_MAX_OBJECT_SIZE = 512 * Math.pow(1024, 2) // 512MB to bytes
+const HTTP_PARTIAL_CONTENT = 206
 
 /**
  * Creates a fresh context object that can be mutated by the request.
@@ -92,17 +93,26 @@ export function withErrorHandler (handler) {
 }
 
 /**
+ * Validates the request uses a specific HTTP method(s).
+ * @param {...string} method Allowed HTTP method(s).
+ * @returns {import('./bindings.js').Middleware<Context>}
+ */
+export function createWithHttpMethod (...method) {
+  return (handler) => {
+    return (request, env, ctx) => {
+      if (!method.includes(request.method)) {
+        throw new HttpError('method not allowed', { status: 405 })
+      }
+      return handler(request, env, ctx)
+    }
+  }
+}
+
+/**
  * Validates the request uses a HTTP GET method.
  * @type {import('./bindings.js').Middleware<Context>}
  */
-export function withHttpGet (handler) {
-  return (request, env, ctx) => {
-    if (request.method !== 'GET') {
-      throw Object.assign(new Error('method not allowed'), { status: 405 })
-    }
-    return handler(request, env, ctx)
-  }
-}
+export const withHttpGet = createWithHttpMethod('GET')
 
 /**
  * Extracts the data CID, the path and search params from the URL.
@@ -199,8 +209,8 @@ export function withCdnCache (handler) {
 
     response = await handler(request, env, ctx)
 
-    // cache the repsonse if success status
-    if (response.ok && !response.headers.has('Content-Range')) {
+    // cache the repsonse if success status, and not range request
+    if (response.ok && response.status !== HTTP_PARTIAL_CONTENT) {
       const contentLength = response.headers.get('Content-Length')
       if (contentLength && parseInt(contentLength) < CF_CACHE_MAX_OBJECT_SIZE) {
         ctx.waitUntil(cache.put(request, response.clone()))

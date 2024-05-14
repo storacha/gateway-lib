@@ -1,6 +1,6 @@
 import type { CID } from 'multiformats/cid'
 import type { UnixFSEntry } from 'ipfs-unixfs-exporter'
-import type { IDagula } from 'dagula'
+import type { BlockService, DagService, UnixfsService } from 'dagula'
 import type { TimeoutController } from 'timeout-abort-controller'
 
 export {}
@@ -23,8 +23,16 @@ export interface TimeoutControllerContext extends Context {
   timeoutController: TimeoutController
 }
 
-export interface DagulaContext extends Context {
-  dagula: IDagula
+export interface BlockContext extends Context {
+  blocks: BlockService
+}
+
+export interface DagContext extends Context {
+  dag: DagService
+}
+
+export interface UnixfsContext extends Context {
+  unixfs: UnixfsService
 }
 
 export interface UnixfsEntryContext extends Context {

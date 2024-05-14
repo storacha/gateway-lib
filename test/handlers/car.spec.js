@@ -20,7 +20,7 @@ describe('CAR handler', () => {
     const rootBlock = await encode({ value: { leaf: leafBlock.cid }, codec: cbor, hasher })
     const blockstore = mockBlockstore([leafBlock, rootBlock])
     const dagula = new Dagula(blockstore)
-    const ctx = { waitUntil, dagula, dataCid: rootBlock.cid, path, searchParams }
+    const ctx = { waitUntil, dag: dagula, dataCid: rootBlock.cid, path, searchParams }
     const env = { DEBUG: 'true' }
     const req = new Request(`http://localhost/ipfs/${rootBlock.cid}`)
     const res = await handleCar(req, env, ctx)
@@ -40,7 +40,7 @@ describe('CAR handler', () => {
     const dagula = new Dagula(blockstore)
     const url = new URL(`http://localhost/ipfs/${rootBlock.cid}/leaf0?dag-scope=block`)
     const path = url.pathname.replace(`/ipfs/${rootBlock.cid}`, '')
-    const ctx = { waitUntil, dagula, dataCid: rootBlock.cid, path, searchParams: url.searchParams }
+    const ctx = { waitUntil, dag: dagula, dataCid: rootBlock.cid, path, searchParams: url.searchParams }
     const env = { DEBUG: 'true' }
     const req = new Request(url)
     const res = await handleCar(req, env, ctx)
@@ -64,7 +64,7 @@ describe('CAR handler', () => {
     const dagula = new Dagula(blockstore)
     const url = new URL(`http://localhost/ipfs/${rootBlock.cid}`)
     const path = url.pathname.replace(`/ipfs/${rootBlock.cid}`, '')
-    const ctx = { waitUntil, dagula, dataCid: rootBlock.cid, path, searchParams: url.searchParams }
+    const ctx = { waitUntil, dag: dagula, dataCid: rootBlock.cid, path, searchParams: url.searchParams }
     const env = { DEBUG: 'true' }
     const req = new Request(url, {
       headers: {
@@ -104,7 +104,7 @@ describe('CAR handler', () => {
     const dagula = new Dagula(blockstore)
     const url = new URL(`http://localhost/ipfs/${rootBlock.cid}`)
     const path = url.pathname.replace(`/ipfs/${rootBlock.cid}`, '')
-    const ctx = { waitUntil, dagula, dataCid: rootBlock.cid, path, searchParams: url.searchParams }
+    const ctx = { waitUntil, dag: dagula, dataCid: rootBlock.cid, path, searchParams: url.searchParams }
     const env = { DEBUG: 'true' }
     const req = new Request(url, {
       headers: {
