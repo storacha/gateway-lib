@@ -1,5 +1,16 @@
 # Changelog
 
+## [5.0.0](https://github.com/web3-storage/gateway-lib/compare/v4.1.1...v5.0.0) (2024-05-14)
+
+
+### ⚠ BREAKING CHANGES
+
+* dependencies for handlers have changed, splitting out block, DAG and unixfs services. These are all satisfied by the `Dagula` class for the time being.
+
+### Features
+
+* support byte range for raw block requests ([#57](https://github.com/web3-storage/gateway-lib/issues/57)) ([496cb24](https://github.com/web3-storage/gateway-lib/commit/496cb241b6ed2634c93475b5a2dd574deea8b343))
+
 ## [4.1.1](https://github.com/web3-storage/gateway-lib/compare/v4.1.0...v4.1.1) (2024-01-17)
 
 
