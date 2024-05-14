@@ -27,8 +27,7 @@ export const decodeRangeHeader = (str) => {
  * @param {number} totalSize
  * @returns {import('dagula').AbsoluteRange}
  */
-export const resolveRange = (range, totalSize) => {
-  const last = range[1] == null ? (totalSize - 1) : range[1]
-  const first = range[1] == null && range[0] < 0 ? totalSize + range[0] : range[0]
-  return [first, last]
-}
+export const resolveRange = ([first, last], totalSize) => [
+  first < 0 ? totalSize + first : first,
+  last ?? totalSize - 1
+]

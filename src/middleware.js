@@ -7,6 +7,7 @@ import { parseCid, tryParseCid } from './util/cid.js'
 /** @typedef {import('./bindings.js').Context} Context */
 
 const CF_CACHE_MAX_OBJECT_SIZE = 512 * Math.pow(1024, 2) // 512MB to bytes
+const HTTP_PARTIAL_CONTENT = 206
 
 /**
  * Creates a fresh context object that can be mutated by the request.
@@ -209,7 +210,7 @@ export function withCdnCache (handler) {
     response = await handler(request, env, ctx)
 
     // cache the repsonse if success status, and not range request
-    if (response.ok && response.status !== 206) {
+    if (response.ok && response.status !== HTTP_PARTIAL_CONTENT) {
       const contentLength = response.headers.get('Content-Length')
       if (contentLength && parseInt(contentLength) < CF_CACHE_MAX_OBJECT_SIZE) {
         ctx.waitUntil(cache.put(request, response.clone()))
