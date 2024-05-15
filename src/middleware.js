@@ -37,15 +37,12 @@ export function withCorsHeaders (handler) {
     const origin = request.headers.get('origin')
     if (origin) {
       response.headers.set('Access-Control-Allow-Origin', origin)
-      response.headers.set('Vary', 'Origin')
+      response.headers.append('Vary', 'Origin')
     } else {
       response.headers.set('Access-Control-Allow-Origin', '*')
     }
-    response.headers.set('Access-Control-Allow-Methods', 'GET')
-    // response.headers.append('Access-Control-Allow-Headers', 'Range')
-    // response.headers.append('Access-Control-Allow-Headers', 'Content-Range')
-    response.headers.append('Access-Control-Expose-Headers', 'Content-Length')
-    // response.headers.append('Access-Control-Expose-Headers', 'Content-Range')
+    response.headers.set('Access-Control-Allow-Methods', 'GET, HEAD')
+    response.headers.append('Access-Control-Expose-Headers', 'Content-Range')
     return response
   }
 }
