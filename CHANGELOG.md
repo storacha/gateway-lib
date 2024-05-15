@@ -1,5 +1,13 @@
 # Changelog
 
+## [5.0.1](https://github.com/web3-storage/gateway-lib/compare/v5.0.0...v5.0.1) (2024-05-15)
+
+
+### Bug Fixes
+
+* CORS headers ([#59](https://github.com/web3-storage/gateway-lib/issues/59)) ([1726f8b](https://github.com/web3-storage/gateway-lib/commit/1726f8b845d7d0c9b45b0fe872224de6c9722f1d))
+* export http range utility functions ([7cf1e62](https://github.com/web3-storage/gateway-lib/commit/7cf1e62947d6e71a0485ec2c542c8967abd6f37b))
+
 ## [5.0.0](https://github.com/web3-storage/gateway-lib/compare/v4.1.1...v5.0.0) (2024-05-14)
 
 
