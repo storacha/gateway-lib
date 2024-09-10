@@ -1,5 +1,12 @@
 # Changelog
 
+## [5.1.1](https://github.com/storacha/gateway-lib/compare/v5.1.0...v5.1.1) (2024-09-10)
+
+
+### Bug Fixes
+
+* repo URLs ([983e511](https://github.com/storacha/gateway-lib/commit/983e511de4921852832762a380b98a0e6b837640))
+
 ## [5.1.0](https://github.com/storacha/gateway-lib/compare/v5.0.1...v5.1.0) (2024-09-10)
 
 
