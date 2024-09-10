@@ -1,5 +1,17 @@
 # Changelog
 
+## [5.1.0](https://github.com/storacha/gateway-lib/compare/v5.0.1...v5.1.0) (2024-09-10)
+
+
+### Features
+
+* http byte range support ([#61](https://github.com/storacha/gateway-lib/issues/61)) ([5be9a70](https://github.com/storacha/gateway-lib/commit/5be9a70b52693a9844f9bb8eede18baf328143c6))
+
+
+### Bug Fixes
+
+* release please perms ([67cfd95](https://github.com/storacha/gateway-lib/commit/67cfd95cde44bbd51b35da187623b0541ffc5d6f))
+
 ## [5.0.1](https://github.com/web3-storage/gateway-lib/compare/v5.0.0...v5.0.1) (2024-05-15)
 
 
