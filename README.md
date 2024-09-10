@@ -59,8 +59,8 @@ async function handler (request, env, ctx) {
 
 ## Contributing
 
-Feel free to join in. All welcome. [Open an issue](https://github.com/web3-storage/gateway-lib/issues)!
+Feel free to join in. All welcome. [Open an issue](https://github.com/storacha/gateway-lib/issues)!
 
 ## License
 
-Dual-licensed under [MIT + Apache 2.0](https://github.com/web3-storage/gateway-lib/blob/main/LICENSE.md)
+Dual-licensed under [MIT + Apache 2.0](https://github.com/storacha/gateway-lib/blob/main/LICENSE.md)
