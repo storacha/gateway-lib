@@ -72,6 +72,7 @@ export async function handleUnixfsFile (request, env, ctx) {
   if (range && Number(entry.size) !== contentLength) {
     const contentRange = `bytes ${range[0]}-${range[1]}/${entry.size}`
     headers['Content-Range'] = contentRange
+    headers['Content-Length'] = contentLength.toString()
   }
 
   // stream the remainder

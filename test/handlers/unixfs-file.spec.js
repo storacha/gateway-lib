@@ -35,6 +35,7 @@ describe('UnixFS file handler', async () => {
 
     assert.equal(res.status, 206)
     assert.equal(res.headers.get('Content-Range'), `bytes ${first}-${last}/${fileData.length}`)
+    assert.equal(res.headers.get('Content-Length'), last - first + 1)
     const data = await res.text()
     assert.equal(data, 'est')
   })
@@ -46,6 +47,7 @@ describe('UnixFS file handler', async () => {
 
     assert.equal(res.status, 206)
     assert.equal(res.headers.get('Content-Range'), `bytes ${first}-${fileData.length - 1}/${fileData.length}`)
+    assert.equal(res.headers.get('Content-Length'), fileData.length - first)
     const data = await res.text()
     assert.equal(data, 'est')
   })
@@ -57,6 +59,7 @@ describe('UnixFS file handler', async () => {
 
     assert.equal(res.status, 206)
     assert.equal(res.headers.get('Content-Range'), `bytes ${fileData.length + suffix}-${fileData.length - 1}/${fileData.length}`)
+    assert.equal(res.headers.get('Content-Length'), -suffix)
     const data = await res.text()
     assert.equal(data, 'est')
   })
