@@ -11,7 +11,7 @@ import { UnixFS } from 'ipfs-unixfs'
 import { handleUnixfs } from '../../src/handlers/unixfs.js'
 import { mockWaitUntil, mockBlockstore } from '../helpers.js'
 
-describe('UnixFS handler', () => {
+describe('UnixFS directory handler', () => {
   it('directory correctly links to files whose name includes a #', async () => {
     const waitUntil = mockWaitUntil()
     const path = ''

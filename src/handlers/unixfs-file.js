@@ -2,6 +2,7 @@
 import { toReadableStream } from '../util/streams.js'
 import { detectContentType } from '../util/mime.js'
 import { HttpError } from '../util/errors.js'
+import { decodeRangeHeader, resolveRange } from '../util/range.js'
 
 /**
  * @typedef {import('../bindings.js').UnixfsEntryContext} UnixfsFileHandlerContext
@@ -34,8 +35,29 @@ export async function handleUnixfsFile (request, env, ctx) {
     throw new HttpError('method not allowed', { status: 405 })
   }
 
+  /** @type {import('dagula').AbsoluteRange|undefined} */
+  let range
+  if (request.headers.has('range')) {
+    /** @type {import('dagula').Range[]} */
+    let ranges = []
+    try {
+      ranges = decodeRangeHeader(request.headers.get('range') ?? '')
+    } catch (err) {
+      throw new HttpError('invalid range', { cause: err, status: 400 })
+    }
+
+    if (ranges.length > 1) {
+      throw new HttpError('multipart byte range unsupported', { status: 400 })
+    }
+
+    range = resolveRange(ranges[0], Number(entry.size))
+  }
+
   console.log('unixfs root', entry.cid.toString())
-  const contentIterator = entry.content()[Symbol.asyncIterator]()
+  const status = range ? 206 : 200
+  const contentLength = range ? range[1] - range[0] + 1 : Number(entry.size)
+  const exportOpts = range ? { offset: range[0], length: range[1] - range[0] + 1 } : {}
+  const contentIterator = entry.content(exportOpts)[Symbol.asyncIterator]()
   const { done, value: firstChunk } = await contentIterator.next()
   if (done || !firstChunk.length) {
     return new Response(null, { status: 204, headers })
@@ -45,6 +67,11 @@ export async function handleUnixfsFile (request, env, ctx) {
   const contentType = detectContentType(fileName, firstChunk)
   if (contentType) {
     headers['Content-Type'] = contentType
+  }
+
+  if (range && Number(entry.size) !== contentLength) {
+    const contentRange = `bytes ${range[0]}-${range[1]}/${entry.size}`
+    headers['Content-Range'] = contentRange
   }
 
   // stream the remainder
@@ -58,10 +85,9 @@ export async function handleUnixfsFile (request, env, ctx) {
         yield chunk
       }
       // FixedLengthStream does not like when you send less than what you said
-      const entrySize = Number(entry.size)
-      if (bytesWritten < entry.size) {
-        console.warn(`padding with ${entrySize - bytesWritten} zeroed bytes`)
-        yield new Uint8Array(entrySize - bytesWritten)
+      if (bytesWritten < contentLength) {
+        console.warn(`padding with ${contentLength - bytesWritten} zeroed bytes`)
+        yield new Uint8Array(contentLength - bytesWritten)
       }
     } catch (/** @type {any} */ err) {
       console.error(err.stack)
@@ -69,5 +95,5 @@ export async function handleUnixfsFile (request, env, ctx) {
     }
   })())
 
-  return new Response(stream, { headers })
+  return new Response(stream, { status, headers })
 }
