@@ -1,5 +1,12 @@
 # Changelog
 
+## [5.1.2](https://github.com/storacha/gateway-lib/compare/v5.1.1...v5.1.2) (2024-09-10)
+
+
+### Bug Fixes
+
+* content length for byte range requests ([9248917](https://github.com/storacha/gateway-lib/commit/9248917100f843fca1a988696ee3ccdcd666466e))
+
 ## [5.1.1](https://github.com/storacha/gateway-lib/compare/v5.1.0...v5.1.1) (2024-09-10)
 
 
