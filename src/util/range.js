@@ -1,12 +1,17 @@
 import { parseRange } from '@httpland/range-parser'
 
 /**
+ * @import { Range, AbsoluteRange } from 'dagula'
+ */
+
+
+/**
  * @param {string} [str]
- * @returns {import('dagula').Range[]}
+ * @returns {Range[]}
  */
 export const decodeRangeHeader = (str) => {
   if (!str) throw new Error('missing Range header value')
-  /** @type {import('dagula').Range[]} */
+  /** @type {Range[]} */
   const ranges = []
   for (const r of parseRange(str).rangeSet) {
     if (typeof r === 'string') {
@@ -23,9 +28,9 @@ export const decodeRangeHeader = (str) => {
 /**
  * Resolve a range to an absolute range.
  *
- * @param {import('dagula').Range} range
+ * @param {Range} range
  * @param {number} totalSize
- * @returns {import('dagula').AbsoluteRange}
+ * @returns {AbsoluteRange}
  */
 export const resolveRange = ([first, last], totalSize) => [
   first < 0 ? totalSize + first : first,

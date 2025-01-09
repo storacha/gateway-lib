@@ -35,53 +35,12 @@ const declarations = [
      * This file is committed to the repository, as it should rarely change.
      */
 
-    /**
-     * A Handler handles a request. It's an async function which takes a
-     * {@link Request} and returns a {@link Response}. It also has access to the
-     * context and environment for the request.
-     *
-     * @template Context The context keys used by the handler.
-     * @template Env The environment keys used by the handler.
-     */
-    type Handler<Context extends {}, Env extends {} = {}> = (
-      request: Request,
-      env: Env,
-      ctx: Context,
-    ) => Promise<Response>;
-
-    /**
-     * A Middleware is a function that takes a {@link Handler} and returns a new
-     * one. It has access to the context and environment for the request. It can
-     * add to the context, or modify it, but it should not remove keys, so that
-     * upstream middleware can pass context to downstream middleware. It should
-     * generally not modify the environment, as that is shared across all requests.
-     *
-     * @template RequiredContext The context required by the middleware. These keys
-     * must be either provided by upstream middleware, or given to the ultimate
-     * handler.
-     * @template AddedContext The context added by the middleware. These keys will
-     * be available to downstream middleware.
-     * @template Env The environment keys used by the middleware. The entire
-     * environment should be passed to the outermost handler, at the top of the
-     * middleware stack. Middleware shouldn't modify the environment, and should
-     * pass it in its entirety when it calls the next handler.
-     */
-    type Middleware<
-      RequiredContext extends {},
-      AddedContext extends {} = {},
-      Env extends {} = {},
-    > = <HandlerRequiredContext, HandlerEnv>(
-      h: Handler<AddedContext & HandlerRequiredContext, Env & HandlerEnv>,
-    ) => Handler<RequiredContext & HandlerRequiredContext, Env & HandlerEnv>;
-    
-    export type RequiredContextOf<M extends Middleware<any, any, any>> =
-      M extends Middleware<infer T, any, any> ? T : never;
-
-    export type AddedContextOf<M extends Middleware<any, any, any>> =
-      M extends Middleware<any, infer T, any> ? T : never;
-    
-    export type EnvOf<M extends Middleware<any, any, any>> =
-      M extends Middleware<any, any, infer T> ? T : never;
+    import {
+      AddedContextOf,
+      EnvOf,
+      Middleware,
+      RequiredContextOf,
+    } from './bindings'
 
     /**
      * Returns the result of satisfying the {@link Requirements} with the
@@ -90,7 +49,18 @@ const declarations = [
     export type Satisfy<Requirements, With> =
       With extends Pick<Requirements, keyof Requirements & keyof With>
         ? Omit<Requirements, keyof With>
-        : never;
+        : never
+  `,
+
+  /* typescript */ `
+    /**
+     * Composes multiple middleware functions into a single middleware function. The
+     * request will be seen by the composed middleware in the order they are given.
+     *
+     * Note: Due to TypeScript limitations, each arity of this function must be a
+     * separate overload. To compose more than ${MAX_ARGUMENTS} middleware functions, simply nest
+     * smaller compositions.
+     */
   `,
 
   ...Array.from({ length: MAX_ARGUMENTS })
@@ -98,13 +68,7 @@ const declarations = [
     .map((n) => createComposeMiddlewareOverloadDeclaration(n)),
 
   /* typescript */ `
-    function composeMiddleware(
-      ...middlewares: Middleware<any, any, any>[]
-    ): Middleware<any, any, any> {
-      return (handler) => middlewares.reduceRight((h, m) => m(h), handler);
-    }
-  
-    export { composeMiddleware, Middleware, Handler };
+    export { composeMiddleware };
   `,
 ]
 
@@ -119,7 +83,7 @@ function createComposeMiddlewareOverloadDeclaration(argCount) {
   const ns = Array.from({ length: argCount }).map((_, i) => i + 1)
 
   return ts.factory.createFunctionDeclaration(
-    undefined,
+    [ts.factory.createToken(ts.SyntaxKind.DeclareKeyword)],
     undefined,
     'composeMiddleware',
     [
@@ -203,9 +167,11 @@ function createComposeMiddlewareOverloadDeclaration(argCount) {
 
 // Output
 
+const filepath = 'src/composeMiddleware.d.ts'
+
 const printer = ts.createPrinter({ newLine: ts.NewLineKind.LineFeed })
 const resultFile = ts.createSourceFile(
-  'noodle4-output.ts',
+  filepath,
   '',
   ts.ScriptTarget.Latest,
   false,
@@ -220,7 +186,6 @@ const output = declarations
   )
   .join('\n\n')
 
-const filepath = 'src/composeMiddleware.ts'
 const prettierConfig = await prettier.resolveConfig(filepath)
 const formattedOutput = await prettier.format(output, {
   filepath,

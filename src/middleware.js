@@ -4,7 +4,7 @@ import { TimeoutController } from 'timeout-abort-controller'
 import { HttpError } from './util/errors.js'
 import { parseCid, tryParseCid } from './util/cid.js'
 
-/** @typedef {import('./bindings.js').Context} Context */
+/** @import { Middleware, CloudflareContext, DebugEnvironment, IpfsUrlContext, TimeoutControllerContext } from './bindings.js' */
 
 const CF_CACHE_MAX_OBJECT_SIZE = 512 * Math.pow(1024, 2) // 512MB to bytes
 const HTTP_PARTIAL_CONTENT = 206
@@ -18,9 +18,9 @@ const HTTP_PARTIAL_CONTENT = 206
  * Some properties in the original context object are not enumerable so need
  * to be expicitly added.
  *
- * @type {import('./bindings.js').Middleware<Context>}
+ * @type {Middleware<CloudflareContext>}
  */
-export function withContext (handler) {
+export function withContext(handler) {
   return (request, env, ctx) => {
     const context = { ...ctx, waitUntil: ctx.waitUntil.bind(ctx) }
     return handler(request, env, context)
@@ -29,9 +29,9 @@ export function withContext (handler) {
 
 /**
  * Adds CORS headers to the response.
- * @type {import('./bindings.js').Middleware<Context>}
+ * @type {Middleware}
  */
-export function withCorsHeaders (handler) {
+export function withCorsHeaders(handler) {
   return async (request, env, ctx) => {
     const response = await handler(request, env, ctx)
     const origin = request.headers.get('origin')
@@ -50,9 +50,9 @@ export function withCorsHeaders (handler) {
 /**
  * Adds Content Disposition header to the response according to the request.
  * https://github.com/ipfs/specs/blob/main/http-gateways/PATH_GATEWAY.md#request-query-parameters
- * @type {import('./bindings.js').Middleware<Context>}
+ * @type {Middleware}
  */
-export function withContentDispositionHeader (handler) {
+export function withContentDispositionHeader(handler) {
   return async (request, env, ctx) => {
     const response = await handler(request, env, ctx)
     const { searchParams } = new URL(request.url)
@@ -60,11 +60,17 @@ export function withContentDispositionHeader (handler) {
       const fileName = searchParams.get('filename')
       const download = searchParams.get('download')
       if (fileName && download) {
-        response.headers.set('Content-Disposition', `attachment; filename="${fileName}"`)
+        response.headers.set(
+          'Content-Disposition',
+          `attachment; filename="${fileName}"`
+        )
       } else if (download) {
         response.headers.set('Content-Disposition', 'attachment')
       } else if (fileName) {
-        response.headers.set('Content-Disposition', `inline; filename="${fileName}"`)
+        response.headers.set(
+          'Content-Disposition',
+          `inline; filename="${fileName}"`
+        )
       }
     }
     return response
@@ -73,17 +79,18 @@ export function withContentDispositionHeader (handler) {
 
 /**
  * Catches any errors, logs them and returns a suitable response.
- * @type {import('./bindings.js').Middleware<Context>}
+ * @type {Middleware<{}, {}, DebugEnvironment>}
  */
-export function withErrorHandler (handler) {
+export function withErrorHandler(handler) {
   return async (request, env, ctx) => {
     try {
       return await handler(request, env, ctx)
     } catch (/** @type {any} */ err) {
       if (!err.status || err.status >= 500) console.error(err.stack)
-      const msg = env.DEBUG === 'true'
-        ? `${err.stack}${err?.cause?.stack ? `\n[cause]: ${err.cause.stack}` : ''}`
-        : err.message
+      const msg =
+        env.DEBUG === 'true'
+          ? `${err.stack}${err?.cause?.stack ? `\n[cause]: ${err.cause.stack}` : ''}`
+          : err.message
       return new Response(msg, { status: err.status || 500 })
     }
   }
@@ -92,9 +99,9 @@ export function withErrorHandler (handler) {
 /**
  * Validates the request uses a specific HTTP method(s).
  * @param {...string} method Allowed HTTP method(s).
- * @returns {import('./bindings.js').Middleware<Context>}
+ * @returns {Middleware}
  */
-export function createWithHttpMethod (...method) {
+export function createWithHttpMethod(...method) {
   return (handler) => {
     return (request, env, ctx) => {
       if (!method.includes(request.method)) {
@@ -107,15 +114,15 @@ export function createWithHttpMethod (...method) {
 
 /**
  * Validates the request uses a HTTP GET method.
- * @type {import('./bindings.js').Middleware<Context>}
+ * @type {Middleware}
  */
 export const withHttpGet = createWithHttpMethod('GET')
 
 /**
  * Extracts the data CID, the path and search params from the URL.
- * @type {import('./bindings.js').Middleware<import('./bindings.js').IpfsUrlContext>}
+ * @type {Middleware<{}, IpfsUrlContext>}
  */
-export function withParsedIpfsUrl (handler) {
+export function withParsedIpfsUrl(handler) {
   return (request, env, ctx) => {
     const { hostname, pathname, searchParams } = new URL(request.url)
 
@@ -123,15 +130,23 @@ export function withParsedIpfsUrl (handler) {
     let dataCid = tryParseCid(hostParts[0])
     if (dataCid) {
       if (hostParts[1] !== 'ipfs') {
-        throw new HttpError(`unsupported protocol: ${hostParts[1]}`, { status: 400 })
+        throw new HttpError(`unsupported protocol: ${hostParts[1]}`, {
+          status: 400,
+        })
       }
-      const ipfsUrlCtx = Object.assign(ctx, { dataCid, path: pathname, searchParams })
+      const ipfsUrlCtx = Object.assign(ctx, {
+        dataCid,
+        path: pathname,
+        searchParams,
+      })
       return handler(request, env, ipfsUrlCtx)
     }
 
     const pathParts = pathname.split('/')
     if (pathParts[1] !== 'ipfs') {
-      throw new HttpError(`unsupported protocol: ${pathParts[1]}`, { status: 400 })
+      throw new HttpError(`unsupported protocol: ${pathParts[1]}`, {
+        status: 400,
+      })
     }
     try {
       dataCid = parseCid(pathParts[2])
@@ -139,7 +154,11 @@ export function withParsedIpfsUrl (handler) {
       throw new HttpError(`invalid CID: ${pathParts[2]}`, { status: 400 })
     }
     const path = pathParts.slice(3).map(decodeURIComponent).join('/')
-    const ipfsUrlCtx = Object.assign(ctx, { dataCid, path: path ? `/${path}` : '', searchParams })
+    const ipfsUrlCtx = Object.assign(ctx, {
+      dataCid,
+      path: path ? `/${path}` : '',
+      searchParams,
+    })
     return handler(request, env, ipfsUrlCtx)
   }
 }
@@ -148,11 +167,12 @@ export function withParsedIpfsUrl (handler) {
  * Creates a middleware that adds an TimeoutController (an AbortController) to
  * the context that times out after the passed milliseconds. Consumers can
  * optionally call `.reset()` on the controller to restart the timeout.
+ *
  * @param {number} timeout Timeout in milliseconds.
+ * @returns {Middleware<{}, TimeoutControllerContext>}
  */
-export function createWithTimeoutController (timeout) {
-  /** @type {import('./bindings.js').Middleware<import('./bindings.js').TimeoutControllerContext>} */
-  return handler => {
+export function createWithTimeoutController(timeout) {
+  return (handler) => {
     return async (request, env, ctx) => {
       const timeoutController = new TimeoutController(timeout)
       const timeoutCtx = { ...ctx, timeoutController }
@@ -161,10 +181,9 @@ export function createWithTimeoutController (timeout) {
       return new Response(
         response.body.pipeThrough(
           new TransformStream({
-            flush () {
-              // console.log('clearing timeout controller')
+            flush() {
               timeoutController.clear()
-            }
+            },
           })
         ),
         response
@@ -176,9 +195,9 @@ export function createWithTimeoutController (timeout) {
 /**
  * Intercepts request if content cached by just returning cached response.
  * Otherwise proceeds to handler.
- * @type {import('./bindings.js').Middleware<Context>}
+ * @type {Middleware<CloudflareContext>}
  */
-export function withCdnCache (handler) {
+export function withCdnCache(handler) {
   return async (request, env, ctx) => {
     // Should skip cache if instructed by headers
     if ((request.headers.get('Cache-Control') || '').includes('no-cache')) {
@@ -222,16 +241,18 @@ export function withCdnCache (handler) {
  * Pipes reponse through a FixedLengthStream if `Content-Length` header is set.
  * https://developers.cloudflare.com/workers/runtime-apis/streams/transformstream/#fixedlengthstream
  *
- * @type {import('./bindings.js').Middleware<Context>}
+ * @type {Middleware}
  */
-export function withFixedLengthStream (handler) {
+export function withFixedLengthStream(handler) {
   return async (request, env, ctx) => {
     const response = await handler(request, env, ctx)
     if (!response.headers.has('Content-Length') || !response.body) {
       return response
     }
 
-    const contentLength = parseInt(response.headers.get('Content-Length') || '0')
+    const contentLength = parseInt(
+      response.headers.get('Content-Length') || '0'
+    )
     return new Response(
       // @ts-ignore FixedLengthStream is a cloudflare global
       response.body.pipeThrough(new FixedLengthStream(contentLength)),
@@ -240,10 +261,4 @@ export function withFixedLengthStream (handler) {
   }
 }
 
-/**
- * @param {...import('./bindings.js').Middleware<any, any, any>} middlewares
- * @returns {import('./bindings.js').Middleware<any, any, any>}
- */
-export function composeMiddleware (...middlewares) {
-  return handler => middlewares.reduceRight((h, m) => m(h), handler)
-}
+export { composeMiddleware } from './composeMiddleware.js'

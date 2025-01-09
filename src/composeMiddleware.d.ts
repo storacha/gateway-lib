@@ -8,53 +8,12 @@
  * This file is committed to the repository, as it should rarely change.
  */
 
-/**
- * A Handler handles a request. It's an async function which takes a
- * {@link Request} and returns a {@link Response}. It also has access to the
- * context and environment for the request.
- *
- * @template Context The context keys used by the handler.
- * @template Env The environment keys used by the handler.
- */
-type Handler<Context extends {}, Env extends {} = {}> = (
-  request: Request,
-  env: Env,
-  ctx: Context
-) => Promise<Response>
-
-/**
- * A Middleware is a function that takes a {@link Handler} and returns a new
- * one. It has access to the context and environment for the request. It can
- * add to the context, or modify it, but it should not remove keys, so that
- * upstream middleware can pass context to downstream middleware. It should
- * generally not modify the environment, as that is shared across all requests.
- *
- * @template RequiredContext The context required by the middleware. These keys
- * must be either provided by upstream middleware, or given to the ultimate
- * handler.
- * @template AddedContext The context added by the middleware. These keys will
- * be available to downstream middleware.
- * @template Env The environment keys used by the middleware. The entire
- * environment should be passed to the outermost handler, at the top of the
- * middleware stack. Middleware shouldn't modify the environment, and should
- * pass it in its entirety when it calls the next handler.
- */
-type Middleware<
-  RequiredContext extends {},
-  AddedContext extends {} = {},
-  Env extends {} = {},
-> = <HandlerRequiredContext, HandlerEnv>(
-  h: Handler<AddedContext & HandlerRequiredContext, Env & HandlerEnv>
-) => Handler<RequiredContext & HandlerRequiredContext, Env & HandlerEnv>
-
-export type RequiredContextOf<M extends Middleware<any, any, any>> =
-  M extends Middleware<infer T, any, any> ? T : never
-
-export type AddedContextOf<M extends Middleware<any, any, any>> =
-  M extends Middleware<any, infer T, any> ? T : never
-
-export type EnvOf<M extends Middleware<any, any, any>> =
-  M extends Middleware<any, any, infer T> ? T : never
+import {
+  AddedContextOf,
+  EnvOf,
+  Middleware,
+  RequiredContextOf,
+} from './bindings'
 
 /**
  * Returns the result of satisfying the {@link Requirements} with the
@@ -65,13 +24,22 @@ export type Satisfy<Requirements, With> =
     ? Omit<Requirements, keyof With>
     : never
 
-function composeMiddleware<
+/**
+ * Composes multiple middleware functions into a single middleware function. The
+ * request will be seen by the composed middleware in the order they are given.
+ *
+ * Note: Due to TypeScript limitations, each arity of this function must be a
+ * separate overload. To compose more than 20 middleware functions, simply nest
+ * smaller compositions.
+ */
+
+declare function composeMiddleware<
   M1 extends Middleware<any, any, any>,
   M1R extends RequiredContextOf<M1>,
   M1C extends AddedContextOf<M1>,
 >(m1: M1): Middleware<RequiredContextOf<M1>, M1C, EnvOf<M1>>
 
-function composeMiddleware<
+declare function composeMiddleware<
   M1 extends Middleware<any, any, any>,
   M1R extends RequiredContextOf<M1>,
   M1C extends AddedContextOf<M1>,
@@ -87,7 +55,7 @@ function composeMiddleware<
   EnvOf<M1> & EnvOf<M2>
 >
 
-function composeMiddleware<
+declare function composeMiddleware<
   M1 extends Middleware<any, any, any>,
   M1R extends RequiredContextOf<M1>,
   M1C extends AddedContextOf<M1>,
@@ -109,7 +77,7 @@ function composeMiddleware<
   EnvOf<M1> & EnvOf<M2> & EnvOf<M3>
 >
 
-function composeMiddleware<
+declare function composeMiddleware<
   M1 extends Middleware<any, any, any>,
   M1R extends RequiredContextOf<M1>,
   M1C extends AddedContextOf<M1>,
@@ -136,7 +104,7 @@ function composeMiddleware<
   EnvOf<M1> & EnvOf<M2> & EnvOf<M3> & EnvOf<M4>
 >
 
-function composeMiddleware<
+declare function composeMiddleware<
   M1 extends Middleware<any, any, any>,
   M1R extends RequiredContextOf<M1>,
   M1C extends AddedContextOf<M1>,
@@ -168,7 +136,7 @@ function composeMiddleware<
   EnvOf<M1> & EnvOf<M2> & EnvOf<M3> & EnvOf<M4> & EnvOf<M5>
 >
 
-function composeMiddleware<
+declare function composeMiddleware<
   M1 extends Middleware<any, any, any>,
   M1R extends RequiredContextOf<M1>,
   M1C extends AddedContextOf<M1>,
@@ -205,7 +173,7 @@ function composeMiddleware<
   EnvOf<M1> & EnvOf<M2> & EnvOf<M3> & EnvOf<M4> & EnvOf<M5> & EnvOf<M6>
 >
 
-function composeMiddleware<
+declare function composeMiddleware<
   M1 extends Middleware<any, any, any>,
   M1R extends RequiredContextOf<M1>,
   M1C extends AddedContextOf<M1>,
@@ -253,7 +221,7 @@ function composeMiddleware<
     EnvOf<M7>
 >
 
-function composeMiddleware<
+declare function composeMiddleware<
   M1 extends Middleware<any, any, any>,
   M1R extends RequiredContextOf<M1>,
   M1C extends AddedContextOf<M1>,
@@ -307,7 +275,7 @@ function composeMiddleware<
     EnvOf<M8>
 >
 
-function composeMiddleware<
+declare function composeMiddleware<
   M1 extends Middleware<any, any, any>,
   M1R extends RequiredContextOf<M1>,
   M1C extends AddedContextOf<M1>,
@@ -367,7 +335,7 @@ function composeMiddleware<
     EnvOf<M9>
 >
 
-function composeMiddleware<
+declare function composeMiddleware<
   M1 extends Middleware<any, any, any>,
   M1R extends RequiredContextOf<M1>,
   M1C extends AddedContextOf<M1>,
@@ -433,7 +401,7 @@ function composeMiddleware<
     EnvOf<M10>
 >
 
-function composeMiddleware<
+declare function composeMiddleware<
   M1 extends Middleware<any, any, any>,
   M1R extends RequiredContextOf<M1>,
   M1C extends AddedContextOf<M1>,
@@ -505,7 +473,7 @@ function composeMiddleware<
     EnvOf<M11>
 >
 
-function composeMiddleware<
+declare function composeMiddleware<
   M1 extends Middleware<any, any, any>,
   M1R extends RequiredContextOf<M1>,
   M1C extends AddedContextOf<M1>,
@@ -583,7 +551,7 @@ function composeMiddleware<
     EnvOf<M12>
 >
 
-function composeMiddleware<
+declare function composeMiddleware<
   M1 extends Middleware<any, any, any>,
   M1R extends RequiredContextOf<M1>,
   M1C extends AddedContextOf<M1>,
@@ -667,7 +635,7 @@ function composeMiddleware<
     EnvOf<M13>
 >
 
-function composeMiddleware<
+declare function composeMiddleware<
   M1 extends Middleware<any, any, any>,
   M1R extends RequiredContextOf<M1>,
   M1C extends AddedContextOf<M1>,
@@ -757,7 +725,7 @@ function composeMiddleware<
     EnvOf<M14>
 >
 
-function composeMiddleware<
+declare function composeMiddleware<
   M1 extends Middleware<any, any, any>,
   M1R extends RequiredContextOf<M1>,
   M1C extends AddedContextOf<M1>,
@@ -853,7 +821,7 @@ function composeMiddleware<
     EnvOf<M15>
 >
 
-function composeMiddleware<
+declare function composeMiddleware<
   M1 extends Middleware<any, any, any>,
   M1R extends RequiredContextOf<M1>,
   M1C extends AddedContextOf<M1>,
@@ -955,7 +923,7 @@ function composeMiddleware<
     EnvOf<M16>
 >
 
-function composeMiddleware<
+declare function composeMiddleware<
   M1 extends Middleware<any, any, any>,
   M1R extends RequiredContextOf<M1>,
   M1C extends AddedContextOf<M1>,
@@ -1063,7 +1031,7 @@ function composeMiddleware<
     EnvOf<M17>
 >
 
-function composeMiddleware<
+declare function composeMiddleware<
   M1 extends Middleware<any, any, any>,
   M1R extends RequiredContextOf<M1>,
   M1C extends AddedContextOf<M1>,
@@ -1177,7 +1145,7 @@ function composeMiddleware<
     EnvOf<M18>
 >
 
-function composeMiddleware<
+declare function composeMiddleware<
   M1 extends Middleware<any, any, any>,
   M1R extends RequiredContextOf<M1>,
   M1C extends AddedContextOf<M1>,
@@ -1297,7 +1265,7 @@ function composeMiddleware<
     EnvOf<M19>
 >
 
-function composeMiddleware<
+declare function composeMiddleware<
   M1 extends Middleware<any, any, any>,
   M1R extends RequiredContextOf<M1>,
   M1C extends AddedContextOf<M1>,
@@ -1423,10 +1391,4 @@ function composeMiddleware<
     EnvOf<M20>
 >
 
-function composeMiddleware(
-  ...middlewares: Middleware<any, any, any>[]
-): Middleware<any, any, any> {
-  return (handler) => middlewares.reduceRight((h, m) => m(h), handler)
-}
-
-export { composeMiddleware, Middleware, Handler }
+export { composeMiddleware }

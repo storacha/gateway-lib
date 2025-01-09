@@ -8,7 +8,13 @@ import { handleUnixfsFile } from './unixfs-file.js'
 import { HttpError } from '../util/errors.js'
 
 /**
- * @typedef {import('../bindings.js').UnixfsEntryContext & import('../bindings.js').IpfsUrlContext & import('../bindings.js').UnixfsContext & { timeoutController?: import('../bindings.js').TimeoutControllerContext['timeoutController'] }} UnixfsDirectoryHandlerContext
+ * @import {
+ *   UnixfsEntryContext,
+ *   IpfsUrlContext,
+ *   UnixfsContext,
+ *   TimeoutControllerContext,
+ *   Handler
+ * } from '../bindings.js'
  */
 
 /**
@@ -43,7 +49,7 @@ const knownIcons = Object.fromEntries([
   'tga', 'tgz', 'tiff', 'txt', 'wav', 'wmv', 'xls', 'xlsx', 'xml', 'yml', 'zip'
 ].map(ext => [ext, true]))
 
-/** @type {import('../bindings.js').Handler<UnixfsDirectoryHandlerContext>} */
+/** @type {Handler<UnixfsEntryContext & IpfsUrlContext & UnixfsContext & Partial<TimeoutControllerContext>>} */
 export async function handleUnixfsDir (request, env, ctx) {
   const { unixfsEntry: entry, timeoutController: controller, unixfs, dataCid, path } = ctx
   if (!entry) throw new Error('missing UnixFS entry')

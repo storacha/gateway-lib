@@ -5,52 +5,90 @@ import type { TimeoutController } from 'timeout-abort-controller'
 
 export {}
 
-export interface Environment {
+export interface DebugEnvironment {
   DEBUG?: string
 }
 
-export interface Context {
+export interface CloudflareContext {
   waitUntil(promise: Promise<void>): void
 }
 
-export interface IpfsUrlContext extends Context {
+export interface IpfsUrlContext {
   dataCid: CID
   path: string
   searchParams: URLSearchParams
 }
 
-export interface TimeoutControllerContext extends Context {
+export interface TimeoutControllerContext {
   timeoutController: TimeoutController
 }
 
-export interface BlockContext extends Context {
+export interface BlockContext {
   blocks: BlockService
 }
 
-export interface DagContext extends Context {
+export interface DagContext {
   dag: DagService
 }
 
-export interface UnixfsContext extends Context {
+export interface UnixfsContext {
   unixfs: UnixfsService
 }
 
-export interface UnixfsEntryContext extends Context {
+export interface UnixfsEntryContext {
   unixfsEntry: UnixFSEntry
 }
 
-export interface Handler<C extends Context, E extends Environment = Environment> {
-  (request: Request, env: E, ctx: C): Promise<Response>
-}
+/**
+ * A Handler handles a request. It's an async function which takes a
+ * {@link Request} and returns a {@link Response}. It also has access to the
+ * context and environment for the request.
+ *
+ * @template Context The context keys used by the handler.
+ * @template Env The environment keys used by the handler.
+ */
+export type Handler<Context extends {} = {}, Env extends {} = {}> = (
+  request: Request,
+  env: Env,
+  ctx: Context
+) => Promise<Response>
 
 /**
- * Middleware is a function that returns a handler with a possibly extended
- * context object. The first generic type is the "extended context". i.e. what
- * the context looks like after the middleware is run. The second generic type
- * is the "base context", or in other words the context _required_ by the
- * middleware for it to run. The third type is the environment, which should
- * not be modified.
+ * A Middleware is a function that takes a {@link Handler} and returns a new
+ * one. It has access to the context and environment for the request. It can
+ * add to the context, or modify it, but it should not remove keys, so that
+ * upstream middleware can pass context to downstream middleware. It should
+ * generally not modify the environment, as that is shared across all requests.
+ *
+ * @template RequiredContext The context required by the middleware. These keys
+ * must be either provided by upstream middleware, or given to the ultimate
+ * handler.
+ * @template AddedContext The context added by the middleware. These keys will
+ * be available to downstream middleware.
+ * @template Env The environment keys used by the middleware. The entire
+ * environment should be passed to the outermost handler, at the top of the
+ * middleware stack. Middleware shouldn't modify the environment, and should
+ * pass it in its entirety when it calls the next handler.
  */
-export interface Middleware<XC extends BC, BC extends Context = Context, E extends Environment = Environment> {
-  (h: Handler<XC, E>): Handler<BC, E>
-}
+export type Middleware<
+  RequiredContext extends {} = {},
+  AddedContext extends {} = {},
+  Env extends {} = {},
+> =
+  /**
+   * @template HandlerRequiredContext The context required by the wrapped
+   * handler.
+   * @template HandlerEnv The environment keys used by the wrapped handler.
+   */
+  <HandlerRequiredContext, HandlerEnv>(
+    h: Handler<AddedContext & HandlerRequiredContext, Env & HandlerEnv>
+  ) => Handler<RequiredContext & HandlerRequiredContext, Env & HandlerEnv>
+
+export type RequiredContextOf<M extends Middleware<any, any, any>> =
+  M extends Middleware<infer T, any, any> ? T : never
+
+export type AddedContextOf<M extends Middleware<any, any, any>> =
+  M extends Middleware<any, infer T, any> ? T : never
+
+export type EnvOf<M extends Middleware<any, any, any>> =
+  M extends Middleware<any, any, infer T> ? T : never
