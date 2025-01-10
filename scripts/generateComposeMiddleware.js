@@ -20,7 +20,7 @@ const withBinding = (x, fn) => fn(x)
 const anyMiddlewareType = ts.factory.createTypeReferenceNode('Middleware', [
   ts.factory.createKeywordTypeNode(ts.SyntaxKind.AnyKeyword),
   ts.factory.createKeywordTypeNode(ts.SyntaxKind.AnyKeyword),
-  ts.factory.createKeywordTypeNode(ts.SyntaxKind.AnyKeyword),
+  ts.factory.createKeywordTypeNode(ts.SyntaxKind.AnyKeyword)
 ])
 
 const declarations = [
@@ -69,7 +69,7 @@ const declarations = [
 
   /* typescript */ `
     export { composeMiddleware };
-  `,
+  `
 ]
 
 /**
@@ -79,7 +79,7 @@ const declarations = [
  * @param {number} argCount The number of middleware arguments.
  * @returns {ts.FunctionDeclaration} The TypeScript function declaration.
  */
-function createComposeMiddlewareOverloadDeclaration(argCount) {
+function createComposeMiddlewareOverloadDeclaration (argCount) {
   const ns = Array.from({ length: argCount }).map((_, i) => i + 1)
 
   return ts.factory.createFunctionDeclaration(
@@ -99,15 +99,15 @@ function createComposeMiddlewareOverloadDeclaration(argCount) {
             `M${n}R`,
             withBinding(
               ts.factory.createTypeReferenceNode('RequiredContextOf', [
-                ts.factory.createTypeReferenceNode(`M${n}`),
+                ts.factory.createTypeReferenceNode(`M${n}`)
               ]),
               (requiredContext) =>
                 n === 1
                   ? requiredContext
                   : ts.factory.createTypeReferenceNode('Satisfy', [
-                      requiredContext,
-                      ts.factory.createTypeReferenceNode(`M${n - 1}C`),
-                    ])
+                    requiredContext,
+                    ts.factory.createTypeReferenceNode(`M${n - 1}C`)
+                  ])
             )
           ),
           ts.factory.createTypeParameterDeclaration(
@@ -115,15 +115,15 @@ function createComposeMiddlewareOverloadDeclaration(argCount) {
             `M${n}C`,
             ts.factory.createIntersectionTypeNode([
               ts.factory.createTypeReferenceNode('AddedContextOf', [
-                ts.factory.createTypeReferenceNode(`M${n}`),
+                ts.factory.createTypeReferenceNode(`M${n}`)
               ]),
               ...(n === 1
                 ? []
-                : [ts.factory.createTypeReferenceNode(`M${n - 1}C`)]),
+                : [ts.factory.createTypeReferenceNode(`M${n - 1}C`)])
             ])
-          ),
+          )
         ]
-      }),
+      })
     ],
     ns.map((n) =>
       ts.factory.createParameterDeclaration(
@@ -140,15 +140,15 @@ function createComposeMiddlewareOverloadDeclaration(argCount) {
         ns.map((n) =>
           withBinding(
             ts.factory.createTypeReferenceNode('RequiredContextOf', [
-              ts.factory.createTypeReferenceNode(`M${n}`),
+              ts.factory.createTypeReferenceNode(`M${n}`)
             ]),
             (requiredContext) =>
               n === 1
                 ? requiredContext
                 : ts.factory.createTypeReferenceNode('Satisfy', [
-                    requiredContext,
-                    ts.factory.createTypeReferenceNode(`M${n - 1}C`),
-                  ])
+                  requiredContext,
+                  ts.factory.createTypeReferenceNode(`M${n - 1}C`)
+                ])
           )
         )
       ),
@@ -156,10 +156,10 @@ function createComposeMiddlewareOverloadDeclaration(argCount) {
       ts.factory.createIntersectionTypeNode(
         ns.map((n) =>
           ts.factory.createTypeReferenceNode('EnvOf', [
-            ts.factory.createTypeReferenceNode(`M${n}`),
+            ts.factory.createTypeReferenceNode(`M${n}`)
           ])
         )
-      ),
+      )
     ]),
     undefined
   )
@@ -189,6 +189,6 @@ const output = declarations
 const prettierConfig = await prettier.resolveConfig(filepath)
 const formattedOutput = await prettier.format(output, {
   filepath,
-  ...prettierConfig,
+  ...prettierConfig
 })
 fs.writeFileSync(filepath, formattedOutput)

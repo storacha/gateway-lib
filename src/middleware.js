@@ -20,7 +20,7 @@ const HTTP_PARTIAL_CONTENT = 206
  *
  * @type {Middleware<CloudflareContext>}
  */
-export function withContext(handler) {
+export function withContext (handler) {
   return (request, env, ctx) => {
     const context = { ...ctx, waitUntil: ctx.waitUntil.bind(ctx) }
     return handler(request, env, context)
@@ -31,7 +31,7 @@ export function withContext(handler) {
  * Adds CORS headers to the response.
  * @type {Middleware}
  */
-export function withCorsHeaders(handler) {
+export function withCorsHeaders (handler) {
   return async (request, env, ctx) => {
     const response = await handler(request, env, ctx)
     const origin = request.headers.get('origin')
@@ -52,7 +52,7 @@ export function withCorsHeaders(handler) {
  * https://github.com/ipfs/specs/blob/main/http-gateways/PATH_GATEWAY.md#request-query-parameters
  * @type {Middleware}
  */
-export function withContentDispositionHeader(handler) {
+export function withContentDispositionHeader (handler) {
   return async (request, env, ctx) => {
     const response = await handler(request, env, ctx)
     const { searchParams } = new URL(request.url)
@@ -81,7 +81,7 @@ export function withContentDispositionHeader(handler) {
  * Catches any errors, logs them and returns a suitable response.
  * @type {Middleware<{}, {}, DebugEnvironment>}
  */
-export function withErrorHandler(handler) {
+export function withErrorHandler (handler) {
   return async (request, env, ctx) => {
     try {
       return await handler(request, env, ctx)
@@ -101,7 +101,7 @@ export function withErrorHandler(handler) {
  * @param {...string} method Allowed HTTP method(s).
  * @returns {Middleware}
  */
-export function createWithHttpMethod(...method) {
+export function createWithHttpMethod (...method) {
   return (handler) => {
     return (request, env, ctx) => {
       if (!method.includes(request.method)) {
@@ -122,7 +122,7 @@ export const withHttpGet = createWithHttpMethod('GET')
  * Extracts the data CID, the path and search params from the URL.
  * @type {Middleware<{}, IpfsUrlContext>}
  */
-export function withParsedIpfsUrl(handler) {
+export function withParsedIpfsUrl (handler) {
   return (request, env, ctx) => {
     const { hostname, pathname, searchParams } = new URL(request.url)
 
@@ -131,13 +131,13 @@ export function withParsedIpfsUrl(handler) {
     if (dataCid) {
       if (hostParts[1] !== 'ipfs') {
         throw new HttpError(`unsupported protocol: ${hostParts[1]}`, {
-          status: 400,
+          status: 400
         })
       }
       const ipfsUrlCtx = Object.assign(ctx, {
         dataCid,
         path: pathname,
-        searchParams,
+        searchParams
       })
       return handler(request, env, ipfsUrlCtx)
     }
@@ -145,7 +145,7 @@ export function withParsedIpfsUrl(handler) {
     const pathParts = pathname.split('/')
     if (pathParts[1] !== 'ipfs') {
       throw new HttpError(`unsupported protocol: ${pathParts[1]}`, {
-        status: 400,
+        status: 400
       })
     }
     try {
@@ -157,7 +157,7 @@ export function withParsedIpfsUrl(handler) {
     const ipfsUrlCtx = Object.assign(ctx, {
       dataCid,
       path: path ? `/${path}` : '',
-      searchParams,
+      searchParams
     })
     return handler(request, env, ipfsUrlCtx)
   }
@@ -171,7 +171,7 @@ export function withParsedIpfsUrl(handler) {
  * @param {number} timeout Timeout in milliseconds.
  * @returns {Middleware<{}, TimeoutControllerContext>}
  */
-export function createWithTimeoutController(timeout) {
+export function createWithTimeoutController (timeout) {
   return (handler) => {
     return async (request, env, ctx) => {
       const timeoutController = new TimeoutController(timeout)
@@ -181,9 +181,9 @@ export function createWithTimeoutController(timeout) {
       return new Response(
         response.body.pipeThrough(
           new TransformStream({
-            flush() {
+            flush () {
               timeoutController.clear()
-            },
+            }
           })
         ),
         response
@@ -197,7 +197,7 @@ export function createWithTimeoutController(timeout) {
  * Otherwise proceeds to handler.
  * @type {Middleware<CloudflareContext>}
  */
-export function withCdnCache(handler) {
+export function withCdnCache (handler) {
   return async (request, env, ctx) => {
     // Should skip cache if instructed by headers
     if ((request.headers.get('Cache-Control') || '').includes('no-cache')) {
@@ -243,7 +243,7 @@ export function withCdnCache(handler) {
  *
  * @type {Middleware}
  */
-export function withFixedLengthStream(handler) {
+export function withFixedLengthStream (handler) {
   return async (request, env, ctx) => {
     const response = await handler(request, env, ctx)
     if (!response.headers.has('Content-Length') || !response.body) {

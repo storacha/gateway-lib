@@ -4,7 +4,6 @@ import { parseRange } from '@httpland/range-parser'
  * @import { Range, AbsoluteRange } from 'dagula'
  */
 
-
 /**
  * @param {string} [str]
  * @returns {Range[]}
