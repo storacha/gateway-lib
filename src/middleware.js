@@ -3,8 +3,17 @@
 import { TimeoutController } from 'timeout-abort-controller'
 import { HttpError } from './util/errors.js'
 import { parseCid, tryParseCid } from './util/cid.js'
+import { composeMiddleware } from './composeMiddleware.js'
 
-/** @import { Middleware, CloudflareContext, DebugEnvironment, IpfsUrlContext, TimeoutControllerContext } from './bindings.js' */
+/**
+ * @import {
+ *   Middleware,
+ *   CloudflareContext,
+ *   DebugEnvironment,
+ *   IpfsUrlContext,
+ *   TimeoutControllerContext
+ * } from './bindings.js'
+ */
 
 const CF_CACHE_MAX_OBJECT_SIZE = 512 * Math.pow(1024, 2) // 512MB to bytes
 const HTTP_PARTIAL_CONTENT = 206
@@ -20,7 +29,7 @@ const HTTP_PARTIAL_CONTENT = 206
  *
  * @type {Middleware<CloudflareContext>}
  */
-export function withContext (handler) {
+export const withContext = (handler) => {
   return (request, env, ctx) => {
     const context = { ...ctx, waitUntil: ctx.waitUntil.bind(ctx) }
     return handler(request, env, context)
@@ -31,7 +40,7 @@ export function withContext (handler) {
  * Adds CORS headers to the response.
  * @type {Middleware}
  */
-export function withCorsHeaders (handler) {
+export const withCorsHeaders = (handler) => {
   return async (request, env, ctx) => {
     const response = await handler(request, env, ctx)
     const origin = request.headers.get('origin')
@@ -52,7 +61,7 @@ export function withCorsHeaders (handler) {
  * https://github.com/ipfs/specs/blob/main/http-gateways/PATH_GATEWAY.md#request-query-parameters
  * @type {Middleware}
  */
-export function withContentDispositionHeader (handler) {
+export const withContentDispositionHeader = (handler) => {
   return async (request, env, ctx) => {
     const response = await handler(request, env, ctx)
     const { searchParams } = new URL(request.url)
@@ -81,7 +90,7 @@ export function withContentDispositionHeader (handler) {
  * Catches any errors, logs them and returns a suitable response.
  * @type {Middleware<{}, {}, DebugEnvironment>}
  */
-export function withErrorHandler (handler) {
+export const withErrorHandler = (handler) => {
   return async (request, env, ctx) => {
     try {
       return await handler(request, env, ctx)
@@ -122,7 +131,7 @@ export const withHttpGet = createWithHttpMethod('GET')
  * Extracts the data CID, the path and search params from the URL.
  * @type {Middleware<{}, IpfsUrlContext>}
  */
-export function withParsedIpfsUrl (handler) {
+export const withParsedIpfsUrl = (handler) => {
   return (request, env, ctx) => {
     const { hostname, pathname, searchParams } = new URL(request.url)
 
@@ -197,7 +206,7 @@ export function createWithTimeoutController (timeout) {
  * Otherwise proceeds to handler.
  * @type {Middleware<CloudflareContext>}
  */
-export function withCdnCache (handler) {
+export const withCdnCache = (handler) => {
   return async (request, env, ctx) => {
     // Should skip cache if instructed by headers
     if ((request.headers.get('Cache-Control') || '').includes('no-cache')) {
@@ -243,7 +252,7 @@ export function withCdnCache (handler) {
  *
  * @type {Middleware}
  */
-export function withFixedLengthStream (handler) {
+export const withFixedLengthStream = (handler) => {
   return async (request, env, ctx) => {
     const response = await handler(request, env, ctx)
     if (!response.headers.has('Content-Length') || !response.body) {

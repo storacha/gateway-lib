@@ -80,7 +80,7 @@ export type Middleware<
    * handler.
    * @template HandlerEnv The environment keys used by the wrapped handler.
    */
-  <HandlerRequiredContext, HandlerEnv>(
+  <HandlerRequiredContext extends {}, HandlerEnv extends {}>(
     h: Handler<AddedContext & HandlerRequiredContext, Env & HandlerEnv>
   ) => Handler<RequiredContext & HandlerRequiredContext, Env & HandlerEnv>
 

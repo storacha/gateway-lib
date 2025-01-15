@@ -13,7 +13,7 @@ import {
   EnvOf,
   Middleware,
   RequiredContextOf,
-} from './bindings'
+} from './bindings.js'
 
 /**
  * Returns the result of satisfying the {@link Requirements} with the
@@ -25,11 +25,17 @@ export type Satisfy<Requirements, With> =
     : never
 
 /**
+ * Forces TypeScript to resolve a complex type into a simple single object
+ * type. This makes the type of a composed middleware much easier to read.
+ */
+type Simplify<T> = { [KeyType in keyof T]: T[KeyType] } & {}
+
+/**
  * Composes multiple middleware functions into a single middleware function. The
  * request will be seen by the composed middleware in the order they are given.
  *
  * Note: Due to TypeScript limitations, each arity of this function must be a
- * separate overload. To compose more than 20 middleware functions, simply nest
+ * separate overload. To compose more than 30 middleware functions, simply nest
  * smaller compositions.
  */
 
@@ -37,7 +43,13 @@ declare function composeMiddleware<
   M1 extends Middleware<any, any, any>,
   M1R extends RequiredContextOf<M1>,
   M1C extends AddedContextOf<M1>,
->(m1: M1): Middleware<RequiredContextOf<M1>, M1C, EnvOf<M1>>
+>(
+  m1: M1
+): Middleware<
+  Simplify<RequiredContextOf<M1>>,
+  Simplify<M1C>,
+  Simplify<EnvOf<M1>>
+>
 
 declare function composeMiddleware<
   M1 extends Middleware<any, any, any>,
@@ -50,9 +62,9 @@ declare function composeMiddleware<
   m1: M1,
   m2: M2
 ): Middleware<
-  RequiredContextOf<M1> & Satisfy<RequiredContextOf<M2>, M1C>,
-  M2C,
-  EnvOf<M1> & EnvOf<M2>
+  Simplify<RequiredContextOf<M1> & Satisfy<RequiredContextOf<M2>, M1C>>,
+  Simplify<M2C>,
+  Simplify<EnvOf<M1> & EnvOf<M2>>
 >
 
 declare function composeMiddleware<
@@ -70,11 +82,13 @@ declare function composeMiddleware<
   m2: M2,
   m3: M3
 ): Middleware<
-  RequiredContextOf<M1> &
-    Satisfy<RequiredContextOf<M2>, M1C> &
-    Satisfy<RequiredContextOf<M3>, M2C>,
-  M3C,
-  EnvOf<M1> & EnvOf<M2> & EnvOf<M3>
+  Simplify<
+    RequiredContextOf<M1> &
+      Satisfy<RequiredContextOf<M2>, M1C> &
+      Satisfy<RequiredContextOf<M3>, M2C>
+  >,
+  Simplify<M3C>,
+  Simplify<EnvOf<M1> & EnvOf<M2> & EnvOf<M3>>
 >
 
 declare function composeMiddleware<
@@ -96,12 +110,14 @@ declare function composeMiddleware<
   m3: M3,
   m4: M4
 ): Middleware<
-  RequiredContextOf<M1> &
-    Satisfy<RequiredContextOf<M2>, M1C> &
-    Satisfy<RequiredContextOf<M3>, M2C> &
-    Satisfy<RequiredContextOf<M4>, M3C>,
-  M4C,
-  EnvOf<M1> & EnvOf<M2> & EnvOf<M3> & EnvOf<M4>
+  Simplify<
+    RequiredContextOf<M1> &
+      Satisfy<RequiredContextOf<M2>, M1C> &
+      Satisfy<RequiredContextOf<M3>, M2C> &
+      Satisfy<RequiredContextOf<M4>, M3C>
+  >,
+  Simplify<M4C>,
+  Simplify<EnvOf<M1> & EnvOf<M2> & EnvOf<M3> & EnvOf<M4>>
 >
 
 declare function composeMiddleware<
@@ -127,13 +143,15 @@ declare function composeMiddleware<
   m4: M4,
   m5: M5
 ): Middleware<
-  RequiredContextOf<M1> &
-    Satisfy<RequiredContextOf<M2>, M1C> &
-    Satisfy<RequiredContextOf<M3>, M2C> &
-    Satisfy<RequiredContextOf<M4>, M3C> &
-    Satisfy<RequiredContextOf<M5>, M4C>,
-  M5C,
-  EnvOf<M1> & EnvOf<M2> & EnvOf<M3> & EnvOf<M4> & EnvOf<M5>
+  Simplify<
+    RequiredContextOf<M1> &
+      Satisfy<RequiredContextOf<M2>, M1C> &
+      Satisfy<RequiredContextOf<M3>, M2C> &
+      Satisfy<RequiredContextOf<M4>, M3C> &
+      Satisfy<RequiredContextOf<M5>, M4C>
+  >,
+  Simplify<M5C>,
+  Simplify<EnvOf<M1> & EnvOf<M2> & EnvOf<M3> & EnvOf<M4> & EnvOf<M5>>
 >
 
 declare function composeMiddleware<
@@ -163,14 +181,18 @@ declare function composeMiddleware<
   m5: M5,
   m6: M6
 ): Middleware<
-  RequiredContextOf<M1> &
-    Satisfy<RequiredContextOf<M2>, M1C> &
-    Satisfy<RequiredContextOf<M3>, M2C> &
-    Satisfy<RequiredContextOf<M4>, M3C> &
-    Satisfy<RequiredContextOf<M5>, M4C> &
-    Satisfy<RequiredContextOf<M6>, M5C>,
-  M6C,
-  EnvOf<M1> & EnvOf<M2> & EnvOf<M3> & EnvOf<M4> & EnvOf<M5> & EnvOf<M6>
+  Simplify<
+    RequiredContextOf<M1> &
+      Satisfy<RequiredContextOf<M2>, M1C> &
+      Satisfy<RequiredContextOf<M3>, M2C> &
+      Satisfy<RequiredContextOf<M4>, M3C> &
+      Satisfy<RequiredContextOf<M5>, M4C> &
+      Satisfy<RequiredContextOf<M6>, M5C>
+  >,
+  Simplify<M6C>,
+  Simplify<
+    EnvOf<M1> & EnvOf<M2> & EnvOf<M3> & EnvOf<M4> & EnvOf<M5> & EnvOf<M6>
+  >
 >
 
 declare function composeMiddleware<
@@ -204,21 +226,25 @@ declare function composeMiddleware<
   m6: M6,
   m7: M7
 ): Middleware<
-  RequiredContextOf<M1> &
-    Satisfy<RequiredContextOf<M2>, M1C> &
-    Satisfy<RequiredContextOf<M3>, M2C> &
-    Satisfy<RequiredContextOf<M4>, M3C> &
-    Satisfy<RequiredContextOf<M5>, M4C> &
-    Satisfy<RequiredContextOf<M6>, M5C> &
-    Satisfy<RequiredContextOf<M7>, M6C>,
-  M7C,
-  EnvOf<M1> &
-    EnvOf<M2> &
-    EnvOf<M3> &
-    EnvOf<M4> &
-    EnvOf<M5> &
-    EnvOf<M6> &
-    EnvOf<M7>
+  Simplify<
+    RequiredContextOf<M1> &
+      Satisfy<RequiredContextOf<M2>, M1C> &
+      Satisfy<RequiredContextOf<M3>, M2C> &
+      Satisfy<RequiredContextOf<M4>, M3C> &
+      Satisfy<RequiredContextOf<M5>, M4C> &
+      Satisfy<RequiredContextOf<M6>, M5C> &
+      Satisfy<RequiredContextOf<M7>, M6C>
+  >,
+  Simplify<M7C>,
+  Simplify<
+    EnvOf<M1> &
+      EnvOf<M2> &
+      EnvOf<M3> &
+      EnvOf<M4> &
+      EnvOf<M5> &
+      EnvOf<M6> &
+      EnvOf<M7>
+  >
 >
 
 declare function composeMiddleware<
@@ -256,23 +282,27 @@ declare function composeMiddleware<
   m7: M7,
   m8: M8
 ): Middleware<
-  RequiredContextOf<M1> &
-    Satisfy<RequiredContextOf<M2>, M1C> &
-    Satisfy<RequiredContextOf<M3>, M2C> &
-    Satisfy<RequiredContextOf<M4>, M3C> &
-    Satisfy<RequiredContextOf<M5>, M4C> &
-    Satisfy<RequiredContextOf<M6>, M5C> &
-    Satisfy<RequiredContextOf<M7>, M6C> &
-    Satisfy<RequiredContextOf<M8>, M7C>,
-  M8C,
-  EnvOf<M1> &
-    EnvOf<M2> &
-    EnvOf<M3> &
-    EnvOf<M4> &
-    EnvOf<M5> &
-    EnvOf<M6> &
-    EnvOf<M7> &
-    EnvOf<M8>
+  Simplify<
+    RequiredContextOf<M1> &
+      Satisfy<RequiredContextOf<M2>, M1C> &
+      Satisfy<RequiredContextOf<M3>, M2C> &
+      Satisfy<RequiredContextOf<M4>, M3C> &
+      Satisfy<RequiredContextOf<M5>, M4C> &
+      Satisfy<RequiredContextOf<M6>, M5C> &
+      Satisfy<RequiredContextOf<M7>, M6C> &
+      Satisfy<RequiredContextOf<M8>, M7C>
+  >,
+  Simplify<M8C>,
+  Simplify<
+    EnvOf<M1> &
+      EnvOf<M2> &
+      EnvOf<M3> &
+      EnvOf<M4> &
+      EnvOf<M5> &
+      EnvOf<M6> &
+      EnvOf<M7> &
+      EnvOf<M8>
+  >
 >
 
 declare function composeMiddleware<
@@ -314,25 +344,29 @@ declare function composeMiddleware<
   m8: M8,
   m9: M9
 ): Middleware<
-  RequiredContextOf<M1> &
-    Satisfy<RequiredContextOf<M2>, M1C> &
-    Satisfy<RequiredContextOf<M3>, M2C> &
-    Satisfy<RequiredContextOf<M4>, M3C> &
-    Satisfy<RequiredContextOf<M5>, M4C> &
-    Satisfy<RequiredContextOf<M6>, M5C> &
-    Satisfy<RequiredContextOf<M7>, M6C> &
-    Satisfy<RequiredContextOf<M8>, M7C> &
-    Satisfy<RequiredContextOf<M9>, M8C>,
-  M9C,
-  EnvOf<M1> &
-    EnvOf<M2> &
-    EnvOf<M3> &
-    EnvOf<M4> &
-    EnvOf<M5> &
-    EnvOf<M6> &
-    EnvOf<M7> &
-    EnvOf<M8> &
-    EnvOf<M9>
+  Simplify<
+    RequiredContextOf<M1> &
+      Satisfy<RequiredContextOf<M2>, M1C> &
+      Satisfy<RequiredContextOf<M3>, M2C> &
+      Satisfy<RequiredContextOf<M4>, M3C> &
+      Satisfy<RequiredContextOf<M5>, M4C> &
+      Satisfy<RequiredContextOf<M6>, M5C> &
+      Satisfy<RequiredContextOf<M7>, M6C> &
+      Satisfy<RequiredContextOf<M8>, M7C> &
+      Satisfy<RequiredContextOf<M9>, M8C>
+  >,
+  Simplify<M9C>,
+  Simplify<
+    EnvOf<M1> &
+      EnvOf<M2> &
+      EnvOf<M3> &
+      EnvOf<M4> &
+      EnvOf<M5> &
+      EnvOf<M6> &
+      EnvOf<M7> &
+      EnvOf<M8> &
+      EnvOf<M9>
+  >
 >
 
 declare function composeMiddleware<
@@ -378,27 +412,31 @@ declare function composeMiddleware<
   m9: M9,
   m10: M10
 ): Middleware<
-  RequiredContextOf<M1> &
-    Satisfy<RequiredContextOf<M2>, M1C> &
-    Satisfy<RequiredContextOf<M3>, M2C> &
-    Satisfy<RequiredContextOf<M4>, M3C> &
-    Satisfy<RequiredContextOf<M5>, M4C> &
-    Satisfy<RequiredContextOf<M6>, M5C> &
-    Satisfy<RequiredContextOf<M7>, M6C> &
-    Satisfy<RequiredContextOf<M8>, M7C> &
-    Satisfy<RequiredContextOf<M9>, M8C> &
-    Satisfy<RequiredContextOf<M10>, M9C>,
-  M10C,
-  EnvOf<M1> &
-    EnvOf<M2> &
-    EnvOf<M3> &
-    EnvOf<M4> &
-    EnvOf<M5> &
-    EnvOf<M6> &
-    EnvOf<M7> &
-    EnvOf<M8> &
-    EnvOf<M9> &
-    EnvOf<M10>
+  Simplify<
+    RequiredContextOf<M1> &
+      Satisfy<RequiredContextOf<M2>, M1C> &
+      Satisfy<RequiredContextOf<M3>, M2C> &
+      Satisfy<RequiredContextOf<M4>, M3C> &
+      Satisfy<RequiredContextOf<M5>, M4C> &
+      Satisfy<RequiredContextOf<M6>, M5C> &
+      Satisfy<RequiredContextOf<M7>, M6C> &
+      Satisfy<RequiredContextOf<M8>, M7C> &
+      Satisfy<RequiredContextOf<M9>, M8C> &
+      Satisfy<RequiredContextOf<M10>, M9C>
+  >,
+  Simplify<M10C>,
+  Simplify<
+    EnvOf<M1> &
+      EnvOf<M2> &
+      EnvOf<M3> &
+      EnvOf<M4> &
+      EnvOf<M5> &
+      EnvOf<M6> &
+      EnvOf<M7> &
+      EnvOf<M8> &
+      EnvOf<M9> &
+      EnvOf<M10>
+  >
 >
 
 declare function composeMiddleware<
@@ -448,29 +486,33 @@ declare function composeMiddleware<
   m10: M10,
   m11: M11
 ): Middleware<
-  RequiredContextOf<M1> &
-    Satisfy<RequiredContextOf<M2>, M1C> &
-    Satisfy<RequiredContextOf<M3>, M2C> &
-    Satisfy<RequiredContextOf<M4>, M3C> &
-    Satisfy<RequiredContextOf<M5>, M4C> &
-    Satisfy<RequiredContextOf<M6>, M5C> &
-    Satisfy<RequiredContextOf<M7>, M6C> &
-    Satisfy<RequiredContextOf<M8>, M7C> &
-    Satisfy<RequiredContextOf<M9>, M8C> &
-    Satisfy<RequiredContextOf<M10>, M9C> &
-    Satisfy<RequiredContextOf<M11>, M10C>,
-  M11C,
-  EnvOf<M1> &
-    EnvOf<M2> &
-    EnvOf<M3> &
-    EnvOf<M4> &
-    EnvOf<M5> &
-    EnvOf<M6> &
-    EnvOf<M7> &
-    EnvOf<M8> &
-    EnvOf<M9> &
-    EnvOf<M10> &
-    EnvOf<M11>
+  Simplify<
+    RequiredContextOf<M1> &
+      Satisfy<RequiredContextOf<M2>, M1C> &
+      Satisfy<RequiredContextOf<M3>, M2C> &
+      Satisfy<RequiredContextOf<M4>, M3C> &
+      Satisfy<RequiredContextOf<M5>, M4C> &
+      Satisfy<RequiredContextOf<M6>, M5C> &
+      Satisfy<RequiredContextOf<M7>, M6C> &
+      Satisfy<RequiredContextOf<M8>, M7C> &
+      Satisfy<RequiredContextOf<M9>, M8C> &
+      Satisfy<RequiredContextOf<M10>, M9C> &
+      Satisfy<RequiredContextOf<M11>, M10C>
+  >,
+  Simplify<M11C>,
+  Simplify<
+    EnvOf<M1> &
+      EnvOf<M2> &
+      EnvOf<M3> &
+      EnvOf<M4> &
+      EnvOf<M5> &
+      EnvOf<M6> &
+      EnvOf<M7> &
+      EnvOf<M8> &
+      EnvOf<M9> &
+      EnvOf<M10> &
+      EnvOf<M11>
+  >
 >
 
 declare function composeMiddleware<
@@ -524,31 +566,35 @@ declare function composeMiddleware<
   m11: M11,
   m12: M12
 ): Middleware<
-  RequiredContextOf<M1> &
-    Satisfy<RequiredContextOf<M2>, M1C> &
-    Satisfy<RequiredContextOf<M3>, M2C> &
-    Satisfy<RequiredContextOf<M4>, M3C> &
-    Satisfy<RequiredContextOf<M5>, M4C> &
-    Satisfy<RequiredContextOf<M6>, M5C> &
-    Satisfy<RequiredContextOf<M7>, M6C> &
-    Satisfy<RequiredContextOf<M8>, M7C> &
-    Satisfy<RequiredContextOf<M9>, M8C> &
-    Satisfy<RequiredContextOf<M10>, M9C> &
-    Satisfy<RequiredContextOf<M11>, M10C> &
-    Satisfy<RequiredContextOf<M12>, M11C>,
-  M12C,
-  EnvOf<M1> &
-    EnvOf<M2> &
-    EnvOf<M3> &
-    EnvOf<M4> &
-    EnvOf<M5> &
-    EnvOf<M6> &
-    EnvOf<M7> &
-    EnvOf<M8> &
-    EnvOf<M9> &
-    EnvOf<M10> &
-    EnvOf<M11> &
-    EnvOf<M12>
+  Simplify<
+    RequiredContextOf<M1> &
+      Satisfy<RequiredContextOf<M2>, M1C> &
+      Satisfy<RequiredContextOf<M3>, M2C> &
+      Satisfy<RequiredContextOf<M4>, M3C> &
+      Satisfy<RequiredContextOf<M5>, M4C> &
+      Satisfy<RequiredContextOf<M6>, M5C> &
+      Satisfy<RequiredContextOf<M7>, M6C> &
+      Satisfy<RequiredContextOf<M8>, M7C> &
+      Satisfy<RequiredContextOf<M9>, M8C> &
+      Satisfy<RequiredContextOf<M10>, M9C> &
+      Satisfy<RequiredContextOf<M11>, M10C> &
+      Satisfy<RequiredContextOf<M12>, M11C>
+  >,
+  Simplify<M12C>,
+  Simplify<
+    EnvOf<M1> &
+      EnvOf<M2> &
+      EnvOf<M3> &
+      EnvOf<M4> &
+      EnvOf<M5> &
+      EnvOf<M6> &
+      EnvOf<M7> &
+      EnvOf<M8> &
+      EnvOf<M9> &
+      EnvOf<M10> &
+      EnvOf<M11> &
+      EnvOf<M12>
+  >
 >
 
 declare function composeMiddleware<
@@ -606,33 +652,37 @@ declare function composeMiddleware<
   m12: M12,
   m13: M13
 ): Middleware<
-  RequiredContextOf<M1> &
-    Satisfy<RequiredContextOf<M2>, M1C> &
-    Satisfy<RequiredContextOf<M3>, M2C> &
-    Satisfy<RequiredContextOf<M4>, M3C> &
-    Satisfy<RequiredContextOf<M5>, M4C> &
-    Satisfy<RequiredContextOf<M6>, M5C> &
-    Satisfy<RequiredContextOf<M7>, M6C> &
-    Satisfy<RequiredContextOf<M8>, M7C> &
-    Satisfy<RequiredContextOf<M9>, M8C> &
-    Satisfy<RequiredContextOf<M10>, M9C> &
-    Satisfy<RequiredContextOf<M11>, M10C> &
-    Satisfy<RequiredContextOf<M12>, M11C> &
-    Satisfy<RequiredContextOf<M13>, M12C>,
-  M13C,
-  EnvOf<M1> &
-    EnvOf<M2> &
-    EnvOf<M3> &
-    EnvOf<M4> &
-    EnvOf<M5> &
-    EnvOf<M6> &
-    EnvOf<M7> &
-    EnvOf<M8> &
-    EnvOf<M9> &
-    EnvOf<M10> &
-    EnvOf<M11> &
-    EnvOf<M12> &
-    EnvOf<M13>
+  Simplify<
+    RequiredContextOf<M1> &
+      Satisfy<RequiredContextOf<M2>, M1C> &
+      Satisfy<RequiredContextOf<M3>, M2C> &
+      Satisfy<RequiredContextOf<M4>, M3C> &
+      Satisfy<RequiredContextOf<M5>, M4C> &
+      Satisfy<RequiredContextOf<M6>, M5C> &
+      Satisfy<RequiredContextOf<M7>, M6C> &
+      Satisfy<RequiredContextOf<M8>, M7C> &
+      Satisfy<RequiredContextOf<M9>, M8C> &
+      Satisfy<RequiredContextOf<M10>, M9C> &
+      Satisfy<RequiredContextOf<M11>, M10C> &
+      Satisfy<RequiredContextOf<M12>, M11C> &
+      Satisfy<RequiredContextOf<M13>, M12C>
+  >,
+  Simplify<M13C>,
+  Simplify<
+    EnvOf<M1> &
+      EnvOf<M2> &
+      EnvOf<M3> &
+      EnvOf<M4> &
+      EnvOf<M5> &
+      EnvOf<M6> &
+      EnvOf<M7> &
+      EnvOf<M8> &
+      EnvOf<M9> &
+      EnvOf<M10> &
+      EnvOf<M11> &
+      EnvOf<M12> &
+      EnvOf<M13>
+  >
 >
 
 declare function composeMiddleware<
@@ -694,35 +744,39 @@ declare function composeMiddleware<
   m13: M13,
   m14: M14
 ): Middleware<
-  RequiredContextOf<M1> &
-    Satisfy<RequiredContextOf<M2>, M1C> &
-    Satisfy<RequiredContextOf<M3>, M2C> &
-    Satisfy<RequiredContextOf<M4>, M3C> &
-    Satisfy<RequiredContextOf<M5>, M4C> &
-    Satisfy<RequiredContextOf<M6>, M5C> &
-    Satisfy<RequiredContextOf<M7>, M6C> &
-    Satisfy<RequiredContextOf<M8>, M7C> &
-    Satisfy<RequiredContextOf<M9>, M8C> &
-    Satisfy<RequiredContextOf<M10>, M9C> &
-    Satisfy<RequiredContextOf<M11>, M10C> &
-    Satisfy<RequiredContextOf<M12>, M11C> &
-    Satisfy<RequiredContextOf<M13>, M12C> &
-    Satisfy<RequiredContextOf<M14>, M13C>,
-  M14C,
-  EnvOf<M1> &
-    EnvOf<M2> &
-    EnvOf<M3> &
-    EnvOf<M4> &
-    EnvOf<M5> &
-    EnvOf<M6> &
-    EnvOf<M7> &
-    EnvOf<M8> &
-    EnvOf<M9> &
-    EnvOf<M10> &
-    EnvOf<M11> &
-    EnvOf<M12> &
-    EnvOf<M13> &
-    EnvOf<M14>
+  Simplify<
+    RequiredContextOf<M1> &
+      Satisfy<RequiredContextOf<M2>, M1C> &
+      Satisfy<RequiredContextOf<M3>, M2C> &
+      Satisfy<RequiredContextOf<M4>, M3C> &
+      Satisfy<RequiredContextOf<M5>, M4C> &
+      Satisfy<RequiredContextOf<M6>, M5C> &
+      Satisfy<RequiredContextOf<M7>, M6C> &
+      Satisfy<RequiredContextOf<M8>, M7C> &
+      Satisfy<RequiredContextOf<M9>, M8C> &
+      Satisfy<RequiredContextOf<M10>, M9C> &
+      Satisfy<RequiredContextOf<M11>, M10C> &
+      Satisfy<RequiredContextOf<M12>, M11C> &
+      Satisfy<RequiredContextOf<M13>, M12C> &
+      Satisfy<RequiredContextOf<M14>, M13C>
+  >,
+  Simplify<M14C>,
+  Simplify<
+    EnvOf<M1> &
+      EnvOf<M2> &
+      EnvOf<M3> &
+      EnvOf<M4> &
+      EnvOf<M5> &
+      EnvOf<M6> &
+      EnvOf<M7> &
+      EnvOf<M8> &
+      EnvOf<M9> &
+      EnvOf<M10> &
+      EnvOf<M11> &
+      EnvOf<M12> &
+      EnvOf<M13> &
+      EnvOf<M14>
+  >
 >
 
 declare function composeMiddleware<
@@ -788,37 +842,41 @@ declare function composeMiddleware<
   m14: M14,
   m15: M15
 ): Middleware<
-  RequiredContextOf<M1> &
-    Satisfy<RequiredContextOf<M2>, M1C> &
-    Satisfy<RequiredContextOf<M3>, M2C> &
-    Satisfy<RequiredContextOf<M4>, M3C> &
-    Satisfy<RequiredContextOf<M5>, M4C> &
-    Satisfy<RequiredContextOf<M6>, M5C> &
-    Satisfy<RequiredContextOf<M7>, M6C> &
-    Satisfy<RequiredContextOf<M8>, M7C> &
-    Satisfy<RequiredContextOf<M9>, M8C> &
-    Satisfy<RequiredContextOf<M10>, M9C> &
-    Satisfy<RequiredContextOf<M11>, M10C> &
-    Satisfy<RequiredContextOf<M12>, M11C> &
-    Satisfy<RequiredContextOf<M13>, M12C> &
-    Satisfy<RequiredContextOf<M14>, M13C> &
-    Satisfy<RequiredContextOf<M15>, M14C>,
-  M15C,
-  EnvOf<M1> &
-    EnvOf<M2> &
-    EnvOf<M3> &
-    EnvOf<M4> &
-    EnvOf<M5> &
-    EnvOf<M6> &
-    EnvOf<M7> &
-    EnvOf<M8> &
-    EnvOf<M9> &
-    EnvOf<M10> &
-    EnvOf<M11> &
-    EnvOf<M12> &
-    EnvOf<M13> &
-    EnvOf<M14> &
-    EnvOf<M15>
+  Simplify<
+    RequiredContextOf<M1> &
+      Satisfy<RequiredContextOf<M2>, M1C> &
+      Satisfy<RequiredContextOf<M3>, M2C> &
+      Satisfy<RequiredContextOf<M4>, M3C> &
+      Satisfy<RequiredContextOf<M5>, M4C> &
+      Satisfy<RequiredContextOf<M6>, M5C> &
+      Satisfy<RequiredContextOf<M7>, M6C> &
+      Satisfy<RequiredContextOf<M8>, M7C> &
+      Satisfy<RequiredContextOf<M9>, M8C> &
+      Satisfy<RequiredContextOf<M10>, M9C> &
+      Satisfy<RequiredContextOf<M11>, M10C> &
+      Satisfy<RequiredContextOf<M12>, M11C> &
+      Satisfy<RequiredContextOf<M13>, M12C> &
+      Satisfy<RequiredContextOf<M14>, M13C> &
+      Satisfy<RequiredContextOf<M15>, M14C>
+  >,
+  Simplify<M15C>,
+  Simplify<
+    EnvOf<M1> &
+      EnvOf<M2> &
+      EnvOf<M3> &
+      EnvOf<M4> &
+      EnvOf<M5> &
+      EnvOf<M6> &
+      EnvOf<M7> &
+      EnvOf<M8> &
+      EnvOf<M9> &
+      EnvOf<M10> &
+      EnvOf<M11> &
+      EnvOf<M12> &
+      EnvOf<M13> &
+      EnvOf<M14> &
+      EnvOf<M15>
+  >
 >
 
 declare function composeMiddleware<
@@ -888,39 +946,43 @@ declare function composeMiddleware<
   m15: M15,
   m16: M16
 ): Middleware<
-  RequiredContextOf<M1> &
-    Satisfy<RequiredContextOf<M2>, M1C> &
-    Satisfy<RequiredContextOf<M3>, M2C> &
-    Satisfy<RequiredContextOf<M4>, M3C> &
-    Satisfy<RequiredContextOf<M5>, M4C> &
-    Satisfy<RequiredContextOf<M6>, M5C> &
-    Satisfy<RequiredContextOf<M7>, M6C> &
-    Satisfy<RequiredContextOf<M8>, M7C> &
-    Satisfy<RequiredContextOf<M9>, M8C> &
-    Satisfy<RequiredContextOf<M10>, M9C> &
-    Satisfy<RequiredContextOf<M11>, M10C> &
-    Satisfy<RequiredContextOf<M12>, M11C> &
-    Satisfy<RequiredContextOf<M13>, M12C> &
-    Satisfy<RequiredContextOf<M14>, M13C> &
-    Satisfy<RequiredContextOf<M15>, M14C> &
-    Satisfy<RequiredContextOf<M16>, M15C>,
-  M16C,
-  EnvOf<M1> &
-    EnvOf<M2> &
-    EnvOf<M3> &
-    EnvOf<M4> &
-    EnvOf<M5> &
-    EnvOf<M6> &
-    EnvOf<M7> &
-    EnvOf<M8> &
-    EnvOf<M9> &
-    EnvOf<M10> &
-    EnvOf<M11> &
-    EnvOf<M12> &
-    EnvOf<M13> &
-    EnvOf<M14> &
-    EnvOf<M15> &
-    EnvOf<M16>
+  Simplify<
+    RequiredContextOf<M1> &
+      Satisfy<RequiredContextOf<M2>, M1C> &
+      Satisfy<RequiredContextOf<M3>, M2C> &
+      Satisfy<RequiredContextOf<M4>, M3C> &
+      Satisfy<RequiredContextOf<M5>, M4C> &
+      Satisfy<RequiredContextOf<M6>, M5C> &
+      Satisfy<RequiredContextOf<M7>, M6C> &
+      Satisfy<RequiredContextOf<M8>, M7C> &
+      Satisfy<RequiredContextOf<M9>, M8C> &
+      Satisfy<RequiredContextOf<M10>, M9C> &
+      Satisfy<RequiredContextOf<M11>, M10C> &
+      Satisfy<RequiredContextOf<M12>, M11C> &
+      Satisfy<RequiredContextOf<M13>, M12C> &
+      Satisfy<RequiredContextOf<M14>, M13C> &
+      Satisfy<RequiredContextOf<M15>, M14C> &
+      Satisfy<RequiredContextOf<M16>, M15C>
+  >,
+  Simplify<M16C>,
+  Simplify<
+    EnvOf<M1> &
+      EnvOf<M2> &
+      EnvOf<M3> &
+      EnvOf<M4> &
+      EnvOf<M5> &
+      EnvOf<M6> &
+      EnvOf<M7> &
+      EnvOf<M8> &
+      EnvOf<M9> &
+      EnvOf<M10> &
+      EnvOf<M11> &
+      EnvOf<M12> &
+      EnvOf<M13> &
+      EnvOf<M14> &
+      EnvOf<M15> &
+      EnvOf<M16>
+  >
 >
 
 declare function composeMiddleware<
@@ -994,41 +1056,45 @@ declare function composeMiddleware<
   m16: M16,
   m17: M17
 ): Middleware<
-  RequiredContextOf<M1> &
-    Satisfy<RequiredContextOf<M2>, M1C> &
-    Satisfy<RequiredContextOf<M3>, M2C> &
-    Satisfy<RequiredContextOf<M4>, M3C> &
-    Satisfy<RequiredContextOf<M5>, M4C> &
-    Satisfy<RequiredContextOf<M6>, M5C> &
-    Satisfy<RequiredContextOf<M7>, M6C> &
-    Satisfy<RequiredContextOf<M8>, M7C> &
-    Satisfy<RequiredContextOf<M9>, M8C> &
-    Satisfy<RequiredContextOf<M10>, M9C> &
-    Satisfy<RequiredContextOf<M11>, M10C> &
-    Satisfy<RequiredContextOf<M12>, M11C> &
-    Satisfy<RequiredContextOf<M13>, M12C> &
-    Satisfy<RequiredContextOf<M14>, M13C> &
-    Satisfy<RequiredContextOf<M15>, M14C> &
-    Satisfy<RequiredContextOf<M16>, M15C> &
-    Satisfy<RequiredContextOf<M17>, M16C>,
-  M17C,
-  EnvOf<M1> &
-    EnvOf<M2> &
-    EnvOf<M3> &
-    EnvOf<M4> &
-    EnvOf<M5> &
-    EnvOf<M6> &
-    EnvOf<M7> &
-    EnvOf<M8> &
-    EnvOf<M9> &
-    EnvOf<M10> &
-    EnvOf<M11> &
-    EnvOf<M12> &
-    EnvOf<M13> &
-    EnvOf<M14> &
-    EnvOf<M15> &
-    EnvOf<M16> &
-    EnvOf<M17>
+  Simplify<
+    RequiredContextOf<M1> &
+      Satisfy<RequiredContextOf<M2>, M1C> &
+      Satisfy<RequiredContextOf<M3>, M2C> &
+      Satisfy<RequiredContextOf<M4>, M3C> &
+      Satisfy<RequiredContextOf<M5>, M4C> &
+      Satisfy<RequiredContextOf<M6>, M5C> &
+      Satisfy<RequiredContextOf<M7>, M6C> &
+      Satisfy<RequiredContextOf<M8>, M7C> &
+      Satisfy<RequiredContextOf<M9>, M8C> &
+      Satisfy<RequiredContextOf<M10>, M9C> &
+      Satisfy<RequiredContextOf<M11>, M10C> &
+      Satisfy<RequiredContextOf<M12>, M11C> &
+      Satisfy<RequiredContextOf<M13>, M12C> &
+      Satisfy<RequiredContextOf<M14>, M13C> &
+      Satisfy<RequiredContextOf<M15>, M14C> &
+      Satisfy<RequiredContextOf<M16>, M15C> &
+      Satisfy<RequiredContextOf<M17>, M16C>
+  >,
+  Simplify<M17C>,
+  Simplify<
+    EnvOf<M1> &
+      EnvOf<M2> &
+      EnvOf<M3> &
+      EnvOf<M4> &
+      EnvOf<M5> &
+      EnvOf<M6> &
+      EnvOf<M7> &
+      EnvOf<M8> &
+      EnvOf<M9> &
+      EnvOf<M10> &
+      EnvOf<M11> &
+      EnvOf<M12> &
+      EnvOf<M13> &
+      EnvOf<M14> &
+      EnvOf<M15> &
+      EnvOf<M16> &
+      EnvOf<M17>
+  >
 >
 
 declare function composeMiddleware<
@@ -1106,43 +1172,47 @@ declare function composeMiddleware<
   m17: M17,
   m18: M18
 ): Middleware<
-  RequiredContextOf<M1> &
-    Satisfy<RequiredContextOf<M2>, M1C> &
-    Satisfy<RequiredContextOf<M3>, M2C> &
-    Satisfy<RequiredContextOf<M4>, M3C> &
-    Satisfy<RequiredContextOf<M5>, M4C> &
-    Satisfy<RequiredContextOf<M6>, M5C> &
-    Satisfy<RequiredContextOf<M7>, M6C> &
-    Satisfy<RequiredContextOf<M8>, M7C> &
-    Satisfy<RequiredContextOf<M9>, M8C> &
-    Satisfy<RequiredContextOf<M10>, M9C> &
-    Satisfy<RequiredContextOf<M11>, M10C> &
-    Satisfy<RequiredContextOf<M12>, M11C> &
-    Satisfy<RequiredContextOf<M13>, M12C> &
-    Satisfy<RequiredContextOf<M14>, M13C> &
-    Satisfy<RequiredContextOf<M15>, M14C> &
-    Satisfy<RequiredContextOf<M16>, M15C> &
-    Satisfy<RequiredContextOf<M17>, M16C> &
-    Satisfy<RequiredContextOf<M18>, M17C>,
-  M18C,
-  EnvOf<M1> &
-    EnvOf<M2> &
-    EnvOf<M3> &
-    EnvOf<M4> &
-    EnvOf<M5> &
-    EnvOf<M6> &
-    EnvOf<M7> &
-    EnvOf<M8> &
-    EnvOf<M9> &
-    EnvOf<M10> &
-    EnvOf<M11> &
-    EnvOf<M12> &
-    EnvOf<M13> &
-    EnvOf<M14> &
-    EnvOf<M15> &
-    EnvOf<M16> &
-    EnvOf<M17> &
-    EnvOf<M18>
+  Simplify<
+    RequiredContextOf<M1> &
+      Satisfy<RequiredContextOf<M2>, M1C> &
+      Satisfy<RequiredContextOf<M3>, M2C> &
+      Satisfy<RequiredContextOf<M4>, M3C> &
+      Satisfy<RequiredContextOf<M5>, M4C> &
+      Satisfy<RequiredContextOf<M6>, M5C> &
+      Satisfy<RequiredContextOf<M7>, M6C> &
+      Satisfy<RequiredContextOf<M8>, M7C> &
+      Satisfy<RequiredContextOf<M9>, M8C> &
+      Satisfy<RequiredContextOf<M10>, M9C> &
+      Satisfy<RequiredContextOf<M11>, M10C> &
+      Satisfy<RequiredContextOf<M12>, M11C> &
+      Satisfy<RequiredContextOf<M13>, M12C> &
+      Satisfy<RequiredContextOf<M14>, M13C> &
+      Satisfy<RequiredContextOf<M15>, M14C> &
+      Satisfy<RequiredContextOf<M16>, M15C> &
+      Satisfy<RequiredContextOf<M17>, M16C> &
+      Satisfy<RequiredContextOf<M18>, M17C>
+  >,
+  Simplify<M18C>,
+  Simplify<
+    EnvOf<M1> &
+      EnvOf<M2> &
+      EnvOf<M3> &
+      EnvOf<M4> &
+      EnvOf<M5> &
+      EnvOf<M6> &
+      EnvOf<M7> &
+      EnvOf<M8> &
+      EnvOf<M9> &
+      EnvOf<M10> &
+      EnvOf<M11> &
+      EnvOf<M12> &
+      EnvOf<M13> &
+      EnvOf<M14> &
+      EnvOf<M15> &
+      EnvOf<M16> &
+      EnvOf<M17> &
+      EnvOf<M18>
+  >
 >
 
 declare function composeMiddleware<
@@ -1224,45 +1294,49 @@ declare function composeMiddleware<
   m18: M18,
   m19: M19
 ): Middleware<
-  RequiredContextOf<M1> &
-    Satisfy<RequiredContextOf<M2>, M1C> &
-    Satisfy<RequiredContextOf<M3>, M2C> &
-    Satisfy<RequiredContextOf<M4>, M3C> &
-    Satisfy<RequiredContextOf<M5>, M4C> &
-    Satisfy<RequiredContextOf<M6>, M5C> &
-    Satisfy<RequiredContextOf<M7>, M6C> &
-    Satisfy<RequiredContextOf<M8>, M7C> &
-    Satisfy<RequiredContextOf<M9>, M8C> &
-    Satisfy<RequiredContextOf<M10>, M9C> &
-    Satisfy<RequiredContextOf<M11>, M10C> &
-    Satisfy<RequiredContextOf<M12>, M11C> &
-    Satisfy<RequiredContextOf<M13>, M12C> &
-    Satisfy<RequiredContextOf<M14>, M13C> &
-    Satisfy<RequiredContextOf<M15>, M14C> &
-    Satisfy<RequiredContextOf<M16>, M15C> &
-    Satisfy<RequiredContextOf<M17>, M16C> &
-    Satisfy<RequiredContextOf<M18>, M17C> &
-    Satisfy<RequiredContextOf<M19>, M18C>,
-  M19C,
-  EnvOf<M1> &
-    EnvOf<M2> &
-    EnvOf<M3> &
-    EnvOf<M4> &
-    EnvOf<M5> &
-    EnvOf<M6> &
-    EnvOf<M7> &
-    EnvOf<M8> &
-    EnvOf<M9> &
-    EnvOf<M10> &
-    EnvOf<M11> &
-    EnvOf<M12> &
-    EnvOf<M13> &
-    EnvOf<M14> &
-    EnvOf<M15> &
-    EnvOf<M16> &
-    EnvOf<M17> &
-    EnvOf<M18> &
-    EnvOf<M19>
+  Simplify<
+    RequiredContextOf<M1> &
+      Satisfy<RequiredContextOf<M2>, M1C> &
+      Satisfy<RequiredContextOf<M3>, M2C> &
+      Satisfy<RequiredContextOf<M4>, M3C> &
+      Satisfy<RequiredContextOf<M5>, M4C> &
+      Satisfy<RequiredContextOf<M6>, M5C> &
+      Satisfy<RequiredContextOf<M7>, M6C> &
+      Satisfy<RequiredContextOf<M8>, M7C> &
+      Satisfy<RequiredContextOf<M9>, M8C> &
+      Satisfy<RequiredContextOf<M10>, M9C> &
+      Satisfy<RequiredContextOf<M11>, M10C> &
+      Satisfy<RequiredContextOf<M12>, M11C> &
+      Satisfy<RequiredContextOf<M13>, M12C> &
+      Satisfy<RequiredContextOf<M14>, M13C> &
+      Satisfy<RequiredContextOf<M15>, M14C> &
+      Satisfy<RequiredContextOf<M16>, M15C> &
+      Satisfy<RequiredContextOf<M17>, M16C> &
+      Satisfy<RequiredContextOf<M18>, M17C> &
+      Satisfy<RequiredContextOf<M19>, M18C>
+  >,
+  Simplify<M19C>,
+  Simplify<
+    EnvOf<M1> &
+      EnvOf<M2> &
+      EnvOf<M3> &
+      EnvOf<M4> &
+      EnvOf<M5> &
+      EnvOf<M6> &
+      EnvOf<M7> &
+      EnvOf<M8> &
+      EnvOf<M9> &
+      EnvOf<M10> &
+      EnvOf<M11> &
+      EnvOf<M12> &
+      EnvOf<M13> &
+      EnvOf<M14> &
+      EnvOf<M15> &
+      EnvOf<M16> &
+      EnvOf<M17> &
+      EnvOf<M18> &
+      EnvOf<M19>
+  >
 >
 
 declare function composeMiddleware<
@@ -1348,47 +1422,1681 @@ declare function composeMiddleware<
   m19: M19,
   m20: M20
 ): Middleware<
-  RequiredContextOf<M1> &
-    Satisfy<RequiredContextOf<M2>, M1C> &
-    Satisfy<RequiredContextOf<M3>, M2C> &
-    Satisfy<RequiredContextOf<M4>, M3C> &
-    Satisfy<RequiredContextOf<M5>, M4C> &
-    Satisfy<RequiredContextOf<M6>, M5C> &
-    Satisfy<RequiredContextOf<M7>, M6C> &
-    Satisfy<RequiredContextOf<M8>, M7C> &
-    Satisfy<RequiredContextOf<M9>, M8C> &
-    Satisfy<RequiredContextOf<M10>, M9C> &
-    Satisfy<RequiredContextOf<M11>, M10C> &
-    Satisfy<RequiredContextOf<M12>, M11C> &
-    Satisfy<RequiredContextOf<M13>, M12C> &
-    Satisfy<RequiredContextOf<M14>, M13C> &
-    Satisfy<RequiredContextOf<M15>, M14C> &
-    Satisfy<RequiredContextOf<M16>, M15C> &
-    Satisfy<RequiredContextOf<M17>, M16C> &
-    Satisfy<RequiredContextOf<M18>, M17C> &
-    Satisfy<RequiredContextOf<M19>, M18C> &
-    Satisfy<RequiredContextOf<M20>, M19C>,
-  M20C,
-  EnvOf<M1> &
-    EnvOf<M2> &
-    EnvOf<M3> &
-    EnvOf<M4> &
-    EnvOf<M5> &
-    EnvOf<M6> &
-    EnvOf<M7> &
-    EnvOf<M8> &
-    EnvOf<M9> &
-    EnvOf<M10> &
-    EnvOf<M11> &
-    EnvOf<M12> &
-    EnvOf<M13> &
-    EnvOf<M14> &
-    EnvOf<M15> &
-    EnvOf<M16> &
-    EnvOf<M17> &
-    EnvOf<M18> &
-    EnvOf<M19> &
-    EnvOf<M20>
+  Simplify<
+    RequiredContextOf<M1> &
+      Satisfy<RequiredContextOf<M2>, M1C> &
+      Satisfy<RequiredContextOf<M3>, M2C> &
+      Satisfy<RequiredContextOf<M4>, M3C> &
+      Satisfy<RequiredContextOf<M5>, M4C> &
+      Satisfy<RequiredContextOf<M6>, M5C> &
+      Satisfy<RequiredContextOf<M7>, M6C> &
+      Satisfy<RequiredContextOf<M8>, M7C> &
+      Satisfy<RequiredContextOf<M9>, M8C> &
+      Satisfy<RequiredContextOf<M10>, M9C> &
+      Satisfy<RequiredContextOf<M11>, M10C> &
+      Satisfy<RequiredContextOf<M12>, M11C> &
+      Satisfy<RequiredContextOf<M13>, M12C> &
+      Satisfy<RequiredContextOf<M14>, M13C> &
+      Satisfy<RequiredContextOf<M15>, M14C> &
+      Satisfy<RequiredContextOf<M16>, M15C> &
+      Satisfy<RequiredContextOf<M17>, M16C> &
+      Satisfy<RequiredContextOf<M18>, M17C> &
+      Satisfy<RequiredContextOf<M19>, M18C> &
+      Satisfy<RequiredContextOf<M20>, M19C>
+  >,
+  Simplify<M20C>,
+  Simplify<
+    EnvOf<M1> &
+      EnvOf<M2> &
+      EnvOf<M3> &
+      EnvOf<M4> &
+      EnvOf<M5> &
+      EnvOf<M6> &
+      EnvOf<M7> &
+      EnvOf<M8> &
+      EnvOf<M9> &
+      EnvOf<M10> &
+      EnvOf<M11> &
+      EnvOf<M12> &
+      EnvOf<M13> &
+      EnvOf<M14> &
+      EnvOf<M15> &
+      EnvOf<M16> &
+      EnvOf<M17> &
+      EnvOf<M18> &
+      EnvOf<M19> &
+      EnvOf<M20>
+  >
+>
+
+declare function composeMiddleware<
+  M1 extends Middleware<any, any, any>,
+  M1R extends RequiredContextOf<M1>,
+  M1C extends AddedContextOf<M1>,
+  M2 extends Middleware<any, any, any>,
+  M2R extends Satisfy<RequiredContextOf<M2>, M1C>,
+  M2C extends AddedContextOf<M2> & M1C,
+  M3 extends Middleware<any, any, any>,
+  M3R extends Satisfy<RequiredContextOf<M3>, M2C>,
+  M3C extends AddedContextOf<M3> & M2C,
+  M4 extends Middleware<any, any, any>,
+  M4R extends Satisfy<RequiredContextOf<M4>, M3C>,
+  M4C extends AddedContextOf<M4> & M3C,
+  M5 extends Middleware<any, any, any>,
+  M5R extends Satisfy<RequiredContextOf<M5>, M4C>,
+  M5C extends AddedContextOf<M5> & M4C,
+  M6 extends Middleware<any, any, any>,
+  M6R extends Satisfy<RequiredContextOf<M6>, M5C>,
+  M6C extends AddedContextOf<M6> & M5C,
+  M7 extends Middleware<any, any, any>,
+  M7R extends Satisfy<RequiredContextOf<M7>, M6C>,
+  M7C extends AddedContextOf<M7> & M6C,
+  M8 extends Middleware<any, any, any>,
+  M8R extends Satisfy<RequiredContextOf<M8>, M7C>,
+  M8C extends AddedContextOf<M8> & M7C,
+  M9 extends Middleware<any, any, any>,
+  M9R extends Satisfy<RequiredContextOf<M9>, M8C>,
+  M9C extends AddedContextOf<M9> & M8C,
+  M10 extends Middleware<any, any, any>,
+  M10R extends Satisfy<RequiredContextOf<M10>, M9C>,
+  M10C extends AddedContextOf<M10> & M9C,
+  M11 extends Middleware<any, any, any>,
+  M11R extends Satisfy<RequiredContextOf<M11>, M10C>,
+  M11C extends AddedContextOf<M11> & M10C,
+  M12 extends Middleware<any, any, any>,
+  M12R extends Satisfy<RequiredContextOf<M12>, M11C>,
+  M12C extends AddedContextOf<M12> & M11C,
+  M13 extends Middleware<any, any, any>,
+  M13R extends Satisfy<RequiredContextOf<M13>, M12C>,
+  M13C extends AddedContextOf<M13> & M12C,
+  M14 extends Middleware<any, any, any>,
+  M14R extends Satisfy<RequiredContextOf<M14>, M13C>,
+  M14C extends AddedContextOf<M14> & M13C,
+  M15 extends Middleware<any, any, any>,
+  M15R extends Satisfy<RequiredContextOf<M15>, M14C>,
+  M15C extends AddedContextOf<M15> & M14C,
+  M16 extends Middleware<any, any, any>,
+  M16R extends Satisfy<RequiredContextOf<M16>, M15C>,
+  M16C extends AddedContextOf<M16> & M15C,
+  M17 extends Middleware<any, any, any>,
+  M17R extends Satisfy<RequiredContextOf<M17>, M16C>,
+  M17C extends AddedContextOf<M17> & M16C,
+  M18 extends Middleware<any, any, any>,
+  M18R extends Satisfy<RequiredContextOf<M18>, M17C>,
+  M18C extends AddedContextOf<M18> & M17C,
+  M19 extends Middleware<any, any, any>,
+  M19R extends Satisfy<RequiredContextOf<M19>, M18C>,
+  M19C extends AddedContextOf<M19> & M18C,
+  M20 extends Middleware<any, any, any>,
+  M20R extends Satisfy<RequiredContextOf<M20>, M19C>,
+  M20C extends AddedContextOf<M20> & M19C,
+  M21 extends Middleware<any, any, any>,
+  M21R extends Satisfy<RequiredContextOf<M21>, M20C>,
+  M21C extends AddedContextOf<M21> & M20C,
+>(
+  m1: M1,
+  m2: M2,
+  m3: M3,
+  m4: M4,
+  m5: M5,
+  m6: M6,
+  m7: M7,
+  m8: M8,
+  m9: M9,
+  m10: M10,
+  m11: M11,
+  m12: M12,
+  m13: M13,
+  m14: M14,
+  m15: M15,
+  m16: M16,
+  m17: M17,
+  m18: M18,
+  m19: M19,
+  m20: M20,
+  m21: M21
+): Middleware<
+  Simplify<
+    RequiredContextOf<M1> &
+      Satisfy<RequiredContextOf<M2>, M1C> &
+      Satisfy<RequiredContextOf<M3>, M2C> &
+      Satisfy<RequiredContextOf<M4>, M3C> &
+      Satisfy<RequiredContextOf<M5>, M4C> &
+      Satisfy<RequiredContextOf<M6>, M5C> &
+      Satisfy<RequiredContextOf<M7>, M6C> &
+      Satisfy<RequiredContextOf<M8>, M7C> &
+      Satisfy<RequiredContextOf<M9>, M8C> &
+      Satisfy<RequiredContextOf<M10>, M9C> &
+      Satisfy<RequiredContextOf<M11>, M10C> &
+      Satisfy<RequiredContextOf<M12>, M11C> &
+      Satisfy<RequiredContextOf<M13>, M12C> &
+      Satisfy<RequiredContextOf<M14>, M13C> &
+      Satisfy<RequiredContextOf<M15>, M14C> &
+      Satisfy<RequiredContextOf<M16>, M15C> &
+      Satisfy<RequiredContextOf<M17>, M16C> &
+      Satisfy<RequiredContextOf<M18>, M17C> &
+      Satisfy<RequiredContextOf<M19>, M18C> &
+      Satisfy<RequiredContextOf<M20>, M19C> &
+      Satisfy<RequiredContextOf<M21>, M20C>
+  >,
+  Simplify<M21C>,
+  Simplify<
+    EnvOf<M1> &
+      EnvOf<M2> &
+      EnvOf<M3> &
+      EnvOf<M4> &
+      EnvOf<M5> &
+      EnvOf<M6> &
+      EnvOf<M7> &
+      EnvOf<M8> &
+      EnvOf<M9> &
+      EnvOf<M10> &
+      EnvOf<M11> &
+      EnvOf<M12> &
+      EnvOf<M13> &
+      EnvOf<M14> &
+      EnvOf<M15> &
+      EnvOf<M16> &
+      EnvOf<M17> &
+      EnvOf<M18> &
+      EnvOf<M19> &
+      EnvOf<M20> &
+      EnvOf<M21>
+  >
+>
+
+declare function composeMiddleware<
+  M1 extends Middleware<any, any, any>,
+  M1R extends RequiredContextOf<M1>,
+  M1C extends AddedContextOf<M1>,
+  M2 extends Middleware<any, any, any>,
+  M2R extends Satisfy<RequiredContextOf<M2>, M1C>,
+  M2C extends AddedContextOf<M2> & M1C,
+  M3 extends Middleware<any, any, any>,
+  M3R extends Satisfy<RequiredContextOf<M3>, M2C>,
+  M3C extends AddedContextOf<M3> & M2C,
+  M4 extends Middleware<any, any, any>,
+  M4R extends Satisfy<RequiredContextOf<M4>, M3C>,
+  M4C extends AddedContextOf<M4> & M3C,
+  M5 extends Middleware<any, any, any>,
+  M5R extends Satisfy<RequiredContextOf<M5>, M4C>,
+  M5C extends AddedContextOf<M5> & M4C,
+  M6 extends Middleware<any, any, any>,
+  M6R extends Satisfy<RequiredContextOf<M6>, M5C>,
+  M6C extends AddedContextOf<M6> & M5C,
+  M7 extends Middleware<any, any, any>,
+  M7R extends Satisfy<RequiredContextOf<M7>, M6C>,
+  M7C extends AddedContextOf<M7> & M6C,
+  M8 extends Middleware<any, any, any>,
+  M8R extends Satisfy<RequiredContextOf<M8>, M7C>,
+  M8C extends AddedContextOf<M8> & M7C,
+  M9 extends Middleware<any, any, any>,
+  M9R extends Satisfy<RequiredContextOf<M9>, M8C>,
+  M9C extends AddedContextOf<M9> & M8C,
+  M10 extends Middleware<any, any, any>,
+  M10R extends Satisfy<RequiredContextOf<M10>, M9C>,
+  M10C extends AddedContextOf<M10> & M9C,
+  M11 extends Middleware<any, any, any>,
+  M11R extends Satisfy<RequiredContextOf<M11>, M10C>,
+  M11C extends AddedContextOf<M11> & M10C,
+  M12 extends Middleware<any, any, any>,
+  M12R extends Satisfy<RequiredContextOf<M12>, M11C>,
+  M12C extends AddedContextOf<M12> & M11C,
+  M13 extends Middleware<any, any, any>,
+  M13R extends Satisfy<RequiredContextOf<M13>, M12C>,
+  M13C extends AddedContextOf<M13> & M12C,
+  M14 extends Middleware<any, any, any>,
+  M14R extends Satisfy<RequiredContextOf<M14>, M13C>,
+  M14C extends AddedContextOf<M14> & M13C,
+  M15 extends Middleware<any, any, any>,
+  M15R extends Satisfy<RequiredContextOf<M15>, M14C>,
+  M15C extends AddedContextOf<M15> & M14C,
+  M16 extends Middleware<any, any, any>,
+  M16R extends Satisfy<RequiredContextOf<M16>, M15C>,
+  M16C extends AddedContextOf<M16> & M15C,
+  M17 extends Middleware<any, any, any>,
+  M17R extends Satisfy<RequiredContextOf<M17>, M16C>,
+  M17C extends AddedContextOf<M17> & M16C,
+  M18 extends Middleware<any, any, any>,
+  M18R extends Satisfy<RequiredContextOf<M18>, M17C>,
+  M18C extends AddedContextOf<M18> & M17C,
+  M19 extends Middleware<any, any, any>,
+  M19R extends Satisfy<RequiredContextOf<M19>, M18C>,
+  M19C extends AddedContextOf<M19> & M18C,
+  M20 extends Middleware<any, any, any>,
+  M20R extends Satisfy<RequiredContextOf<M20>, M19C>,
+  M20C extends AddedContextOf<M20> & M19C,
+  M21 extends Middleware<any, any, any>,
+  M21R extends Satisfy<RequiredContextOf<M21>, M20C>,
+  M21C extends AddedContextOf<M21> & M20C,
+  M22 extends Middleware<any, any, any>,
+  M22R extends Satisfy<RequiredContextOf<M22>, M21C>,
+  M22C extends AddedContextOf<M22> & M21C,
+>(
+  m1: M1,
+  m2: M2,
+  m3: M3,
+  m4: M4,
+  m5: M5,
+  m6: M6,
+  m7: M7,
+  m8: M8,
+  m9: M9,
+  m10: M10,
+  m11: M11,
+  m12: M12,
+  m13: M13,
+  m14: M14,
+  m15: M15,
+  m16: M16,
+  m17: M17,
+  m18: M18,
+  m19: M19,
+  m20: M20,
+  m21: M21,
+  m22: M22
+): Middleware<
+  Simplify<
+    RequiredContextOf<M1> &
+      Satisfy<RequiredContextOf<M2>, M1C> &
+      Satisfy<RequiredContextOf<M3>, M2C> &
+      Satisfy<RequiredContextOf<M4>, M3C> &
+      Satisfy<RequiredContextOf<M5>, M4C> &
+      Satisfy<RequiredContextOf<M6>, M5C> &
+      Satisfy<RequiredContextOf<M7>, M6C> &
+      Satisfy<RequiredContextOf<M8>, M7C> &
+      Satisfy<RequiredContextOf<M9>, M8C> &
+      Satisfy<RequiredContextOf<M10>, M9C> &
+      Satisfy<RequiredContextOf<M11>, M10C> &
+      Satisfy<RequiredContextOf<M12>, M11C> &
+      Satisfy<RequiredContextOf<M13>, M12C> &
+      Satisfy<RequiredContextOf<M14>, M13C> &
+      Satisfy<RequiredContextOf<M15>, M14C> &
+      Satisfy<RequiredContextOf<M16>, M15C> &
+      Satisfy<RequiredContextOf<M17>, M16C> &
+      Satisfy<RequiredContextOf<M18>, M17C> &
+      Satisfy<RequiredContextOf<M19>, M18C> &
+      Satisfy<RequiredContextOf<M20>, M19C> &
+      Satisfy<RequiredContextOf<M21>, M20C> &
+      Satisfy<RequiredContextOf<M22>, M21C>
+  >,
+  Simplify<M22C>,
+  Simplify<
+    EnvOf<M1> &
+      EnvOf<M2> &
+      EnvOf<M3> &
+      EnvOf<M4> &
+      EnvOf<M5> &
+      EnvOf<M6> &
+      EnvOf<M7> &
+      EnvOf<M8> &
+      EnvOf<M9> &
+      EnvOf<M10> &
+      EnvOf<M11> &
+      EnvOf<M12> &
+      EnvOf<M13> &
+      EnvOf<M14> &
+      EnvOf<M15> &
+      EnvOf<M16> &
+      EnvOf<M17> &
+      EnvOf<M18> &
+      EnvOf<M19> &
+      EnvOf<M20> &
+      EnvOf<M21> &
+      EnvOf<M22>
+  >
+>
+
+declare function composeMiddleware<
+  M1 extends Middleware<any, any, any>,
+  M1R extends RequiredContextOf<M1>,
+  M1C extends AddedContextOf<M1>,
+  M2 extends Middleware<any, any, any>,
+  M2R extends Satisfy<RequiredContextOf<M2>, M1C>,
+  M2C extends AddedContextOf<M2> & M1C,
+  M3 extends Middleware<any, any, any>,
+  M3R extends Satisfy<RequiredContextOf<M3>, M2C>,
+  M3C extends AddedContextOf<M3> & M2C,
+  M4 extends Middleware<any, any, any>,
+  M4R extends Satisfy<RequiredContextOf<M4>, M3C>,
+  M4C extends AddedContextOf<M4> & M3C,
+  M5 extends Middleware<any, any, any>,
+  M5R extends Satisfy<RequiredContextOf<M5>, M4C>,
+  M5C extends AddedContextOf<M5> & M4C,
+  M6 extends Middleware<any, any, any>,
+  M6R extends Satisfy<RequiredContextOf<M6>, M5C>,
+  M6C extends AddedContextOf<M6> & M5C,
+  M7 extends Middleware<any, any, any>,
+  M7R extends Satisfy<RequiredContextOf<M7>, M6C>,
+  M7C extends AddedContextOf<M7> & M6C,
+  M8 extends Middleware<any, any, any>,
+  M8R extends Satisfy<RequiredContextOf<M8>, M7C>,
+  M8C extends AddedContextOf<M8> & M7C,
+  M9 extends Middleware<any, any, any>,
+  M9R extends Satisfy<RequiredContextOf<M9>, M8C>,
+  M9C extends AddedContextOf<M9> & M8C,
+  M10 extends Middleware<any, any, any>,
+  M10R extends Satisfy<RequiredContextOf<M10>, M9C>,
+  M10C extends AddedContextOf<M10> & M9C,
+  M11 extends Middleware<any, any, any>,
+  M11R extends Satisfy<RequiredContextOf<M11>, M10C>,
+  M11C extends AddedContextOf<M11> & M10C,
+  M12 extends Middleware<any, any, any>,
+  M12R extends Satisfy<RequiredContextOf<M12>, M11C>,
+  M12C extends AddedContextOf<M12> & M11C,
+  M13 extends Middleware<any, any, any>,
+  M13R extends Satisfy<RequiredContextOf<M13>, M12C>,
+  M13C extends AddedContextOf<M13> & M12C,
+  M14 extends Middleware<any, any, any>,
+  M14R extends Satisfy<RequiredContextOf<M14>, M13C>,
+  M14C extends AddedContextOf<M14> & M13C,
+  M15 extends Middleware<any, any, any>,
+  M15R extends Satisfy<RequiredContextOf<M15>, M14C>,
+  M15C extends AddedContextOf<M15> & M14C,
+  M16 extends Middleware<any, any, any>,
+  M16R extends Satisfy<RequiredContextOf<M16>, M15C>,
+  M16C extends AddedContextOf<M16> & M15C,
+  M17 extends Middleware<any, any, any>,
+  M17R extends Satisfy<RequiredContextOf<M17>, M16C>,
+  M17C extends AddedContextOf<M17> & M16C,
+  M18 extends Middleware<any, any, any>,
+  M18R extends Satisfy<RequiredContextOf<M18>, M17C>,
+  M18C extends AddedContextOf<M18> & M17C,
+  M19 extends Middleware<any, any, any>,
+  M19R extends Satisfy<RequiredContextOf<M19>, M18C>,
+  M19C extends AddedContextOf<M19> & M18C,
+  M20 extends Middleware<any, any, any>,
+  M20R extends Satisfy<RequiredContextOf<M20>, M19C>,
+  M20C extends AddedContextOf<M20> & M19C,
+  M21 extends Middleware<any, any, any>,
+  M21R extends Satisfy<RequiredContextOf<M21>, M20C>,
+  M21C extends AddedContextOf<M21> & M20C,
+  M22 extends Middleware<any, any, any>,
+  M22R extends Satisfy<RequiredContextOf<M22>, M21C>,
+  M22C extends AddedContextOf<M22> & M21C,
+  M23 extends Middleware<any, any, any>,
+  M23R extends Satisfy<RequiredContextOf<M23>, M22C>,
+  M23C extends AddedContextOf<M23> & M22C,
+>(
+  m1: M1,
+  m2: M2,
+  m3: M3,
+  m4: M4,
+  m5: M5,
+  m6: M6,
+  m7: M7,
+  m8: M8,
+  m9: M9,
+  m10: M10,
+  m11: M11,
+  m12: M12,
+  m13: M13,
+  m14: M14,
+  m15: M15,
+  m16: M16,
+  m17: M17,
+  m18: M18,
+  m19: M19,
+  m20: M20,
+  m21: M21,
+  m22: M22,
+  m23: M23
+): Middleware<
+  Simplify<
+    RequiredContextOf<M1> &
+      Satisfy<RequiredContextOf<M2>, M1C> &
+      Satisfy<RequiredContextOf<M3>, M2C> &
+      Satisfy<RequiredContextOf<M4>, M3C> &
+      Satisfy<RequiredContextOf<M5>, M4C> &
+      Satisfy<RequiredContextOf<M6>, M5C> &
+      Satisfy<RequiredContextOf<M7>, M6C> &
+      Satisfy<RequiredContextOf<M8>, M7C> &
+      Satisfy<RequiredContextOf<M9>, M8C> &
+      Satisfy<RequiredContextOf<M10>, M9C> &
+      Satisfy<RequiredContextOf<M11>, M10C> &
+      Satisfy<RequiredContextOf<M12>, M11C> &
+      Satisfy<RequiredContextOf<M13>, M12C> &
+      Satisfy<RequiredContextOf<M14>, M13C> &
+      Satisfy<RequiredContextOf<M15>, M14C> &
+      Satisfy<RequiredContextOf<M16>, M15C> &
+      Satisfy<RequiredContextOf<M17>, M16C> &
+      Satisfy<RequiredContextOf<M18>, M17C> &
+      Satisfy<RequiredContextOf<M19>, M18C> &
+      Satisfy<RequiredContextOf<M20>, M19C> &
+      Satisfy<RequiredContextOf<M21>, M20C> &
+      Satisfy<RequiredContextOf<M22>, M21C> &
+      Satisfy<RequiredContextOf<M23>, M22C>
+  >,
+  Simplify<M23C>,
+  Simplify<
+    EnvOf<M1> &
+      EnvOf<M2> &
+      EnvOf<M3> &
+      EnvOf<M4> &
+      EnvOf<M5> &
+      EnvOf<M6> &
+      EnvOf<M7> &
+      EnvOf<M8> &
+      EnvOf<M9> &
+      EnvOf<M10> &
+      EnvOf<M11> &
+      EnvOf<M12> &
+      EnvOf<M13> &
+      EnvOf<M14> &
+      EnvOf<M15> &
+      EnvOf<M16> &
+      EnvOf<M17> &
+      EnvOf<M18> &
+      EnvOf<M19> &
+      EnvOf<M20> &
+      EnvOf<M21> &
+      EnvOf<M22> &
+      EnvOf<M23>
+  >
+>
+
+declare function composeMiddleware<
+  M1 extends Middleware<any, any, any>,
+  M1R extends RequiredContextOf<M1>,
+  M1C extends AddedContextOf<M1>,
+  M2 extends Middleware<any, any, any>,
+  M2R extends Satisfy<RequiredContextOf<M2>, M1C>,
+  M2C extends AddedContextOf<M2> & M1C,
+  M3 extends Middleware<any, any, any>,
+  M3R extends Satisfy<RequiredContextOf<M3>, M2C>,
+  M3C extends AddedContextOf<M3> & M2C,
+  M4 extends Middleware<any, any, any>,
+  M4R extends Satisfy<RequiredContextOf<M4>, M3C>,
+  M4C extends AddedContextOf<M4> & M3C,
+  M5 extends Middleware<any, any, any>,
+  M5R extends Satisfy<RequiredContextOf<M5>, M4C>,
+  M5C extends AddedContextOf<M5> & M4C,
+  M6 extends Middleware<any, any, any>,
+  M6R extends Satisfy<RequiredContextOf<M6>, M5C>,
+  M6C extends AddedContextOf<M6> & M5C,
+  M7 extends Middleware<any, any, any>,
+  M7R extends Satisfy<RequiredContextOf<M7>, M6C>,
+  M7C extends AddedContextOf<M7> & M6C,
+  M8 extends Middleware<any, any, any>,
+  M8R extends Satisfy<RequiredContextOf<M8>, M7C>,
+  M8C extends AddedContextOf<M8> & M7C,
+  M9 extends Middleware<any, any, any>,
+  M9R extends Satisfy<RequiredContextOf<M9>, M8C>,
+  M9C extends AddedContextOf<M9> & M8C,
+  M10 extends Middleware<any, any, any>,
+  M10R extends Satisfy<RequiredContextOf<M10>, M9C>,
+  M10C extends AddedContextOf<M10> & M9C,
+  M11 extends Middleware<any, any, any>,
+  M11R extends Satisfy<RequiredContextOf<M11>, M10C>,
+  M11C extends AddedContextOf<M11> & M10C,
+  M12 extends Middleware<any, any, any>,
+  M12R extends Satisfy<RequiredContextOf<M12>, M11C>,
+  M12C extends AddedContextOf<M12> & M11C,
+  M13 extends Middleware<any, any, any>,
+  M13R extends Satisfy<RequiredContextOf<M13>, M12C>,
+  M13C extends AddedContextOf<M13> & M12C,
+  M14 extends Middleware<any, any, any>,
+  M14R extends Satisfy<RequiredContextOf<M14>, M13C>,
+  M14C extends AddedContextOf<M14> & M13C,
+  M15 extends Middleware<any, any, any>,
+  M15R extends Satisfy<RequiredContextOf<M15>, M14C>,
+  M15C extends AddedContextOf<M15> & M14C,
+  M16 extends Middleware<any, any, any>,
+  M16R extends Satisfy<RequiredContextOf<M16>, M15C>,
+  M16C extends AddedContextOf<M16> & M15C,
+  M17 extends Middleware<any, any, any>,
+  M17R extends Satisfy<RequiredContextOf<M17>, M16C>,
+  M17C extends AddedContextOf<M17> & M16C,
+  M18 extends Middleware<any, any, any>,
+  M18R extends Satisfy<RequiredContextOf<M18>, M17C>,
+  M18C extends AddedContextOf<M18> & M17C,
+  M19 extends Middleware<any, any, any>,
+  M19R extends Satisfy<RequiredContextOf<M19>, M18C>,
+  M19C extends AddedContextOf<M19> & M18C,
+  M20 extends Middleware<any, any, any>,
+  M20R extends Satisfy<RequiredContextOf<M20>, M19C>,
+  M20C extends AddedContextOf<M20> & M19C,
+  M21 extends Middleware<any, any, any>,
+  M21R extends Satisfy<RequiredContextOf<M21>, M20C>,
+  M21C extends AddedContextOf<M21> & M20C,
+  M22 extends Middleware<any, any, any>,
+  M22R extends Satisfy<RequiredContextOf<M22>, M21C>,
+  M22C extends AddedContextOf<M22> & M21C,
+  M23 extends Middleware<any, any, any>,
+  M23R extends Satisfy<RequiredContextOf<M23>, M22C>,
+  M23C extends AddedContextOf<M23> & M22C,
+  M24 extends Middleware<any, any, any>,
+  M24R extends Satisfy<RequiredContextOf<M24>, M23C>,
+  M24C extends AddedContextOf<M24> & M23C,
+>(
+  m1: M1,
+  m2: M2,
+  m3: M3,
+  m4: M4,
+  m5: M5,
+  m6: M6,
+  m7: M7,
+  m8: M8,
+  m9: M9,
+  m10: M10,
+  m11: M11,
+  m12: M12,
+  m13: M13,
+  m14: M14,
+  m15: M15,
+  m16: M16,
+  m17: M17,
+  m18: M18,
+  m19: M19,
+  m20: M20,
+  m21: M21,
+  m22: M22,
+  m23: M23,
+  m24: M24
+): Middleware<
+  Simplify<
+    RequiredContextOf<M1> &
+      Satisfy<RequiredContextOf<M2>, M1C> &
+      Satisfy<RequiredContextOf<M3>, M2C> &
+      Satisfy<RequiredContextOf<M4>, M3C> &
+      Satisfy<RequiredContextOf<M5>, M4C> &
+      Satisfy<RequiredContextOf<M6>, M5C> &
+      Satisfy<RequiredContextOf<M7>, M6C> &
+      Satisfy<RequiredContextOf<M8>, M7C> &
+      Satisfy<RequiredContextOf<M9>, M8C> &
+      Satisfy<RequiredContextOf<M10>, M9C> &
+      Satisfy<RequiredContextOf<M11>, M10C> &
+      Satisfy<RequiredContextOf<M12>, M11C> &
+      Satisfy<RequiredContextOf<M13>, M12C> &
+      Satisfy<RequiredContextOf<M14>, M13C> &
+      Satisfy<RequiredContextOf<M15>, M14C> &
+      Satisfy<RequiredContextOf<M16>, M15C> &
+      Satisfy<RequiredContextOf<M17>, M16C> &
+      Satisfy<RequiredContextOf<M18>, M17C> &
+      Satisfy<RequiredContextOf<M19>, M18C> &
+      Satisfy<RequiredContextOf<M20>, M19C> &
+      Satisfy<RequiredContextOf<M21>, M20C> &
+      Satisfy<RequiredContextOf<M22>, M21C> &
+      Satisfy<RequiredContextOf<M23>, M22C> &
+      Satisfy<RequiredContextOf<M24>, M23C>
+  >,
+  Simplify<M24C>,
+  Simplify<
+    EnvOf<M1> &
+      EnvOf<M2> &
+      EnvOf<M3> &
+      EnvOf<M4> &
+      EnvOf<M5> &
+      EnvOf<M6> &
+      EnvOf<M7> &
+      EnvOf<M8> &
+      EnvOf<M9> &
+      EnvOf<M10> &
+      EnvOf<M11> &
+      EnvOf<M12> &
+      EnvOf<M13> &
+      EnvOf<M14> &
+      EnvOf<M15> &
+      EnvOf<M16> &
+      EnvOf<M17> &
+      EnvOf<M18> &
+      EnvOf<M19> &
+      EnvOf<M20> &
+      EnvOf<M21> &
+      EnvOf<M22> &
+      EnvOf<M23> &
+      EnvOf<M24>
+  >
+>
+
+declare function composeMiddleware<
+  M1 extends Middleware<any, any, any>,
+  M1R extends RequiredContextOf<M1>,
+  M1C extends AddedContextOf<M1>,
+  M2 extends Middleware<any, any, any>,
+  M2R extends Satisfy<RequiredContextOf<M2>, M1C>,
+  M2C extends AddedContextOf<M2> & M1C,
+  M3 extends Middleware<any, any, any>,
+  M3R extends Satisfy<RequiredContextOf<M3>, M2C>,
+  M3C extends AddedContextOf<M3> & M2C,
+  M4 extends Middleware<any, any, any>,
+  M4R extends Satisfy<RequiredContextOf<M4>, M3C>,
+  M4C extends AddedContextOf<M4> & M3C,
+  M5 extends Middleware<any, any, any>,
+  M5R extends Satisfy<RequiredContextOf<M5>, M4C>,
+  M5C extends AddedContextOf<M5> & M4C,
+  M6 extends Middleware<any, any, any>,
+  M6R extends Satisfy<RequiredContextOf<M6>, M5C>,
+  M6C extends AddedContextOf<M6> & M5C,
+  M7 extends Middleware<any, any, any>,
+  M7R extends Satisfy<RequiredContextOf<M7>, M6C>,
+  M7C extends AddedContextOf<M7> & M6C,
+  M8 extends Middleware<any, any, any>,
+  M8R extends Satisfy<RequiredContextOf<M8>, M7C>,
+  M8C extends AddedContextOf<M8> & M7C,
+  M9 extends Middleware<any, any, any>,
+  M9R extends Satisfy<RequiredContextOf<M9>, M8C>,
+  M9C extends AddedContextOf<M9> & M8C,
+  M10 extends Middleware<any, any, any>,
+  M10R extends Satisfy<RequiredContextOf<M10>, M9C>,
+  M10C extends AddedContextOf<M10> & M9C,
+  M11 extends Middleware<any, any, any>,
+  M11R extends Satisfy<RequiredContextOf<M11>, M10C>,
+  M11C extends AddedContextOf<M11> & M10C,
+  M12 extends Middleware<any, any, any>,
+  M12R extends Satisfy<RequiredContextOf<M12>, M11C>,
+  M12C extends AddedContextOf<M12> & M11C,
+  M13 extends Middleware<any, any, any>,
+  M13R extends Satisfy<RequiredContextOf<M13>, M12C>,
+  M13C extends AddedContextOf<M13> & M12C,
+  M14 extends Middleware<any, any, any>,
+  M14R extends Satisfy<RequiredContextOf<M14>, M13C>,
+  M14C extends AddedContextOf<M14> & M13C,
+  M15 extends Middleware<any, any, any>,
+  M15R extends Satisfy<RequiredContextOf<M15>, M14C>,
+  M15C extends AddedContextOf<M15> & M14C,
+  M16 extends Middleware<any, any, any>,
+  M16R extends Satisfy<RequiredContextOf<M16>, M15C>,
+  M16C extends AddedContextOf<M16> & M15C,
+  M17 extends Middleware<any, any, any>,
+  M17R extends Satisfy<RequiredContextOf<M17>, M16C>,
+  M17C extends AddedContextOf<M17> & M16C,
+  M18 extends Middleware<any, any, any>,
+  M18R extends Satisfy<RequiredContextOf<M18>, M17C>,
+  M18C extends AddedContextOf<M18> & M17C,
+  M19 extends Middleware<any, any, any>,
+  M19R extends Satisfy<RequiredContextOf<M19>, M18C>,
+  M19C extends AddedContextOf<M19> & M18C,
+  M20 extends Middleware<any, any, any>,
+  M20R extends Satisfy<RequiredContextOf<M20>, M19C>,
+  M20C extends AddedContextOf<M20> & M19C,
+  M21 extends Middleware<any, any, any>,
+  M21R extends Satisfy<RequiredContextOf<M21>, M20C>,
+  M21C extends AddedContextOf<M21> & M20C,
+  M22 extends Middleware<any, any, any>,
+  M22R extends Satisfy<RequiredContextOf<M22>, M21C>,
+  M22C extends AddedContextOf<M22> & M21C,
+  M23 extends Middleware<any, any, any>,
+  M23R extends Satisfy<RequiredContextOf<M23>, M22C>,
+  M23C extends AddedContextOf<M23> & M22C,
+  M24 extends Middleware<any, any, any>,
+  M24R extends Satisfy<RequiredContextOf<M24>, M23C>,
+  M24C extends AddedContextOf<M24> & M23C,
+  M25 extends Middleware<any, any, any>,
+  M25R extends Satisfy<RequiredContextOf<M25>, M24C>,
+  M25C extends AddedContextOf<M25> & M24C,
+>(
+  m1: M1,
+  m2: M2,
+  m3: M3,
+  m4: M4,
+  m5: M5,
+  m6: M6,
+  m7: M7,
+  m8: M8,
+  m9: M9,
+  m10: M10,
+  m11: M11,
+  m12: M12,
+  m13: M13,
+  m14: M14,
+  m15: M15,
+  m16: M16,
+  m17: M17,
+  m18: M18,
+  m19: M19,
+  m20: M20,
+  m21: M21,
+  m22: M22,
+  m23: M23,
+  m24: M24,
+  m25: M25
+): Middleware<
+  Simplify<
+    RequiredContextOf<M1> &
+      Satisfy<RequiredContextOf<M2>, M1C> &
+      Satisfy<RequiredContextOf<M3>, M2C> &
+      Satisfy<RequiredContextOf<M4>, M3C> &
+      Satisfy<RequiredContextOf<M5>, M4C> &
+      Satisfy<RequiredContextOf<M6>, M5C> &
+      Satisfy<RequiredContextOf<M7>, M6C> &
+      Satisfy<RequiredContextOf<M8>, M7C> &
+      Satisfy<RequiredContextOf<M9>, M8C> &
+      Satisfy<RequiredContextOf<M10>, M9C> &
+      Satisfy<RequiredContextOf<M11>, M10C> &
+      Satisfy<RequiredContextOf<M12>, M11C> &
+      Satisfy<RequiredContextOf<M13>, M12C> &
+      Satisfy<RequiredContextOf<M14>, M13C> &
+      Satisfy<RequiredContextOf<M15>, M14C> &
+      Satisfy<RequiredContextOf<M16>, M15C> &
+      Satisfy<RequiredContextOf<M17>, M16C> &
+      Satisfy<RequiredContextOf<M18>, M17C> &
+      Satisfy<RequiredContextOf<M19>, M18C> &
+      Satisfy<RequiredContextOf<M20>, M19C> &
+      Satisfy<RequiredContextOf<M21>, M20C> &
+      Satisfy<RequiredContextOf<M22>, M21C> &
+      Satisfy<RequiredContextOf<M23>, M22C> &
+      Satisfy<RequiredContextOf<M24>, M23C> &
+      Satisfy<RequiredContextOf<M25>, M24C>
+  >,
+  Simplify<M25C>,
+  Simplify<
+    EnvOf<M1> &
+      EnvOf<M2> &
+      EnvOf<M3> &
+      EnvOf<M4> &
+      EnvOf<M5> &
+      EnvOf<M6> &
+      EnvOf<M7> &
+      EnvOf<M8> &
+      EnvOf<M9> &
+      EnvOf<M10> &
+      EnvOf<M11> &
+      EnvOf<M12> &
+      EnvOf<M13> &
+      EnvOf<M14> &
+      EnvOf<M15> &
+      EnvOf<M16> &
+      EnvOf<M17> &
+      EnvOf<M18> &
+      EnvOf<M19> &
+      EnvOf<M20> &
+      EnvOf<M21> &
+      EnvOf<M22> &
+      EnvOf<M23> &
+      EnvOf<M24> &
+      EnvOf<M25>
+  >
+>
+
+declare function composeMiddleware<
+  M1 extends Middleware<any, any, any>,
+  M1R extends RequiredContextOf<M1>,
+  M1C extends AddedContextOf<M1>,
+  M2 extends Middleware<any, any, any>,
+  M2R extends Satisfy<RequiredContextOf<M2>, M1C>,
+  M2C extends AddedContextOf<M2> & M1C,
+  M3 extends Middleware<any, any, any>,
+  M3R extends Satisfy<RequiredContextOf<M3>, M2C>,
+  M3C extends AddedContextOf<M3> & M2C,
+  M4 extends Middleware<any, any, any>,
+  M4R extends Satisfy<RequiredContextOf<M4>, M3C>,
+  M4C extends AddedContextOf<M4> & M3C,
+  M5 extends Middleware<any, any, any>,
+  M5R extends Satisfy<RequiredContextOf<M5>, M4C>,
+  M5C extends AddedContextOf<M5> & M4C,
+  M6 extends Middleware<any, any, any>,
+  M6R extends Satisfy<RequiredContextOf<M6>, M5C>,
+  M6C extends AddedContextOf<M6> & M5C,
+  M7 extends Middleware<any, any, any>,
+  M7R extends Satisfy<RequiredContextOf<M7>, M6C>,
+  M7C extends AddedContextOf<M7> & M6C,
+  M8 extends Middleware<any, any, any>,
+  M8R extends Satisfy<RequiredContextOf<M8>, M7C>,
+  M8C extends AddedContextOf<M8> & M7C,
+  M9 extends Middleware<any, any, any>,
+  M9R extends Satisfy<RequiredContextOf<M9>, M8C>,
+  M9C extends AddedContextOf<M9> & M8C,
+  M10 extends Middleware<any, any, any>,
+  M10R extends Satisfy<RequiredContextOf<M10>, M9C>,
+  M10C extends AddedContextOf<M10> & M9C,
+  M11 extends Middleware<any, any, any>,
+  M11R extends Satisfy<RequiredContextOf<M11>, M10C>,
+  M11C extends AddedContextOf<M11> & M10C,
+  M12 extends Middleware<any, any, any>,
+  M12R extends Satisfy<RequiredContextOf<M12>, M11C>,
+  M12C extends AddedContextOf<M12> & M11C,
+  M13 extends Middleware<any, any, any>,
+  M13R extends Satisfy<RequiredContextOf<M13>, M12C>,
+  M13C extends AddedContextOf<M13> & M12C,
+  M14 extends Middleware<any, any, any>,
+  M14R extends Satisfy<RequiredContextOf<M14>, M13C>,
+  M14C extends AddedContextOf<M14> & M13C,
+  M15 extends Middleware<any, any, any>,
+  M15R extends Satisfy<RequiredContextOf<M15>, M14C>,
+  M15C extends AddedContextOf<M15> & M14C,
+  M16 extends Middleware<any, any, any>,
+  M16R extends Satisfy<RequiredContextOf<M16>, M15C>,
+  M16C extends AddedContextOf<M16> & M15C,
+  M17 extends Middleware<any, any, any>,
+  M17R extends Satisfy<RequiredContextOf<M17>, M16C>,
+  M17C extends AddedContextOf<M17> & M16C,
+  M18 extends Middleware<any, any, any>,
+  M18R extends Satisfy<RequiredContextOf<M18>, M17C>,
+  M18C extends AddedContextOf<M18> & M17C,
+  M19 extends Middleware<any, any, any>,
+  M19R extends Satisfy<RequiredContextOf<M19>, M18C>,
+  M19C extends AddedContextOf<M19> & M18C,
+  M20 extends Middleware<any, any, any>,
+  M20R extends Satisfy<RequiredContextOf<M20>, M19C>,
+  M20C extends AddedContextOf<M20> & M19C,
+  M21 extends Middleware<any, any, any>,
+  M21R extends Satisfy<RequiredContextOf<M21>, M20C>,
+  M21C extends AddedContextOf<M21> & M20C,
+  M22 extends Middleware<any, any, any>,
+  M22R extends Satisfy<RequiredContextOf<M22>, M21C>,
+  M22C extends AddedContextOf<M22> & M21C,
+  M23 extends Middleware<any, any, any>,
+  M23R extends Satisfy<RequiredContextOf<M23>, M22C>,
+  M23C extends AddedContextOf<M23> & M22C,
+  M24 extends Middleware<any, any, any>,
+  M24R extends Satisfy<RequiredContextOf<M24>, M23C>,
+  M24C extends AddedContextOf<M24> & M23C,
+  M25 extends Middleware<any, any, any>,
+  M25R extends Satisfy<RequiredContextOf<M25>, M24C>,
+  M25C extends AddedContextOf<M25> & M24C,
+  M26 extends Middleware<any, any, any>,
+  M26R extends Satisfy<RequiredContextOf<M26>, M25C>,
+  M26C extends AddedContextOf<M26> & M25C,
+>(
+  m1: M1,
+  m2: M2,
+  m3: M3,
+  m4: M4,
+  m5: M5,
+  m6: M6,
+  m7: M7,
+  m8: M8,
+  m9: M9,
+  m10: M10,
+  m11: M11,
+  m12: M12,
+  m13: M13,
+  m14: M14,
+  m15: M15,
+  m16: M16,
+  m17: M17,
+  m18: M18,
+  m19: M19,
+  m20: M20,
+  m21: M21,
+  m22: M22,
+  m23: M23,
+  m24: M24,
+  m25: M25,
+  m26: M26
+): Middleware<
+  Simplify<
+    RequiredContextOf<M1> &
+      Satisfy<RequiredContextOf<M2>, M1C> &
+      Satisfy<RequiredContextOf<M3>, M2C> &
+      Satisfy<RequiredContextOf<M4>, M3C> &
+      Satisfy<RequiredContextOf<M5>, M4C> &
+      Satisfy<RequiredContextOf<M6>, M5C> &
+      Satisfy<RequiredContextOf<M7>, M6C> &
+      Satisfy<RequiredContextOf<M8>, M7C> &
+      Satisfy<RequiredContextOf<M9>, M8C> &
+      Satisfy<RequiredContextOf<M10>, M9C> &
+      Satisfy<RequiredContextOf<M11>, M10C> &
+      Satisfy<RequiredContextOf<M12>, M11C> &
+      Satisfy<RequiredContextOf<M13>, M12C> &
+      Satisfy<RequiredContextOf<M14>, M13C> &
+      Satisfy<RequiredContextOf<M15>, M14C> &
+      Satisfy<RequiredContextOf<M16>, M15C> &
+      Satisfy<RequiredContextOf<M17>, M16C> &
+      Satisfy<RequiredContextOf<M18>, M17C> &
+      Satisfy<RequiredContextOf<M19>, M18C> &
+      Satisfy<RequiredContextOf<M20>, M19C> &
+      Satisfy<RequiredContextOf<M21>, M20C> &
+      Satisfy<RequiredContextOf<M22>, M21C> &
+      Satisfy<RequiredContextOf<M23>, M22C> &
+      Satisfy<RequiredContextOf<M24>, M23C> &
+      Satisfy<RequiredContextOf<M25>, M24C> &
+      Satisfy<RequiredContextOf<M26>, M25C>
+  >,
+  Simplify<M26C>,
+  Simplify<
+    EnvOf<M1> &
+      EnvOf<M2> &
+      EnvOf<M3> &
+      EnvOf<M4> &
+      EnvOf<M5> &
+      EnvOf<M6> &
+      EnvOf<M7> &
+      EnvOf<M8> &
+      EnvOf<M9> &
+      EnvOf<M10> &
+      EnvOf<M11> &
+      EnvOf<M12> &
+      EnvOf<M13> &
+      EnvOf<M14> &
+      EnvOf<M15> &
+      EnvOf<M16> &
+      EnvOf<M17> &
+      EnvOf<M18> &
+      EnvOf<M19> &
+      EnvOf<M20> &
+      EnvOf<M21> &
+      EnvOf<M22> &
+      EnvOf<M23> &
+      EnvOf<M24> &
+      EnvOf<M25> &
+      EnvOf<M26>
+  >
+>
+
+declare function composeMiddleware<
+  M1 extends Middleware<any, any, any>,
+  M1R extends RequiredContextOf<M1>,
+  M1C extends AddedContextOf<M1>,
+  M2 extends Middleware<any, any, any>,
+  M2R extends Satisfy<RequiredContextOf<M2>, M1C>,
+  M2C extends AddedContextOf<M2> & M1C,
+  M3 extends Middleware<any, any, any>,
+  M3R extends Satisfy<RequiredContextOf<M3>, M2C>,
+  M3C extends AddedContextOf<M3> & M2C,
+  M4 extends Middleware<any, any, any>,
+  M4R extends Satisfy<RequiredContextOf<M4>, M3C>,
+  M4C extends AddedContextOf<M4> & M3C,
+  M5 extends Middleware<any, any, any>,
+  M5R extends Satisfy<RequiredContextOf<M5>, M4C>,
+  M5C extends AddedContextOf<M5> & M4C,
+  M6 extends Middleware<any, any, any>,
+  M6R extends Satisfy<RequiredContextOf<M6>, M5C>,
+  M6C extends AddedContextOf<M6> & M5C,
+  M7 extends Middleware<any, any, any>,
+  M7R extends Satisfy<RequiredContextOf<M7>, M6C>,
+  M7C extends AddedContextOf<M7> & M6C,
+  M8 extends Middleware<any, any, any>,
+  M8R extends Satisfy<RequiredContextOf<M8>, M7C>,
+  M8C extends AddedContextOf<M8> & M7C,
+  M9 extends Middleware<any, any, any>,
+  M9R extends Satisfy<RequiredContextOf<M9>, M8C>,
+  M9C extends AddedContextOf<M9> & M8C,
+  M10 extends Middleware<any, any, any>,
+  M10R extends Satisfy<RequiredContextOf<M10>, M9C>,
+  M10C extends AddedContextOf<M10> & M9C,
+  M11 extends Middleware<any, any, any>,
+  M11R extends Satisfy<RequiredContextOf<M11>, M10C>,
+  M11C extends AddedContextOf<M11> & M10C,
+  M12 extends Middleware<any, any, any>,
+  M12R extends Satisfy<RequiredContextOf<M12>, M11C>,
+  M12C extends AddedContextOf<M12> & M11C,
+  M13 extends Middleware<any, any, any>,
+  M13R extends Satisfy<RequiredContextOf<M13>, M12C>,
+  M13C extends AddedContextOf<M13> & M12C,
+  M14 extends Middleware<any, any, any>,
+  M14R extends Satisfy<RequiredContextOf<M14>, M13C>,
+  M14C extends AddedContextOf<M14> & M13C,
+  M15 extends Middleware<any, any, any>,
+  M15R extends Satisfy<RequiredContextOf<M15>, M14C>,
+  M15C extends AddedContextOf<M15> & M14C,
+  M16 extends Middleware<any, any, any>,
+  M16R extends Satisfy<RequiredContextOf<M16>, M15C>,
+  M16C extends AddedContextOf<M16> & M15C,
+  M17 extends Middleware<any, any, any>,
+  M17R extends Satisfy<RequiredContextOf<M17>, M16C>,
+  M17C extends AddedContextOf<M17> & M16C,
+  M18 extends Middleware<any, any, any>,
+  M18R extends Satisfy<RequiredContextOf<M18>, M17C>,
+  M18C extends AddedContextOf<M18> & M17C,
+  M19 extends Middleware<any, any, any>,
+  M19R extends Satisfy<RequiredContextOf<M19>, M18C>,
+  M19C extends AddedContextOf<M19> & M18C,
+  M20 extends Middleware<any, any, any>,
+  M20R extends Satisfy<RequiredContextOf<M20>, M19C>,
+  M20C extends AddedContextOf<M20> & M19C,
+  M21 extends Middleware<any, any, any>,
+  M21R extends Satisfy<RequiredContextOf<M21>, M20C>,
+  M21C extends AddedContextOf<M21> & M20C,
+  M22 extends Middleware<any, any, any>,
+  M22R extends Satisfy<RequiredContextOf<M22>, M21C>,
+  M22C extends AddedContextOf<M22> & M21C,
+  M23 extends Middleware<any, any, any>,
+  M23R extends Satisfy<RequiredContextOf<M23>, M22C>,
+  M23C extends AddedContextOf<M23> & M22C,
+  M24 extends Middleware<any, any, any>,
+  M24R extends Satisfy<RequiredContextOf<M24>, M23C>,
+  M24C extends AddedContextOf<M24> & M23C,
+  M25 extends Middleware<any, any, any>,
+  M25R extends Satisfy<RequiredContextOf<M25>, M24C>,
+  M25C extends AddedContextOf<M25> & M24C,
+  M26 extends Middleware<any, any, any>,
+  M26R extends Satisfy<RequiredContextOf<M26>, M25C>,
+  M26C extends AddedContextOf<M26> & M25C,
+  M27 extends Middleware<any, any, any>,
+  M27R extends Satisfy<RequiredContextOf<M27>, M26C>,
+  M27C extends AddedContextOf<M27> & M26C,
+>(
+  m1: M1,
+  m2: M2,
+  m3: M3,
+  m4: M4,
+  m5: M5,
+  m6: M6,
+  m7: M7,
+  m8: M8,
+  m9: M9,
+  m10: M10,
+  m11: M11,
+  m12: M12,
+  m13: M13,
+  m14: M14,
+  m15: M15,
+  m16: M16,
+  m17: M17,
+  m18: M18,
+  m19: M19,
+  m20: M20,
+  m21: M21,
+  m22: M22,
+  m23: M23,
+  m24: M24,
+  m25: M25,
+  m26: M26,
+  m27: M27
+): Middleware<
+  Simplify<
+    RequiredContextOf<M1> &
+      Satisfy<RequiredContextOf<M2>, M1C> &
+      Satisfy<RequiredContextOf<M3>, M2C> &
+      Satisfy<RequiredContextOf<M4>, M3C> &
+      Satisfy<RequiredContextOf<M5>, M4C> &
+      Satisfy<RequiredContextOf<M6>, M5C> &
+      Satisfy<RequiredContextOf<M7>, M6C> &
+      Satisfy<RequiredContextOf<M8>, M7C> &
+      Satisfy<RequiredContextOf<M9>, M8C> &
+      Satisfy<RequiredContextOf<M10>, M9C> &
+      Satisfy<RequiredContextOf<M11>, M10C> &
+      Satisfy<RequiredContextOf<M12>, M11C> &
+      Satisfy<RequiredContextOf<M13>, M12C> &
+      Satisfy<RequiredContextOf<M14>, M13C> &
+      Satisfy<RequiredContextOf<M15>, M14C> &
+      Satisfy<RequiredContextOf<M16>, M15C> &
+      Satisfy<RequiredContextOf<M17>, M16C> &
+      Satisfy<RequiredContextOf<M18>, M17C> &
+      Satisfy<RequiredContextOf<M19>, M18C> &
+      Satisfy<RequiredContextOf<M20>, M19C> &
+      Satisfy<RequiredContextOf<M21>, M20C> &
+      Satisfy<RequiredContextOf<M22>, M21C> &
+      Satisfy<RequiredContextOf<M23>, M22C> &
+      Satisfy<RequiredContextOf<M24>, M23C> &
+      Satisfy<RequiredContextOf<M25>, M24C> &
+      Satisfy<RequiredContextOf<M26>, M25C> &
+      Satisfy<RequiredContextOf<M27>, M26C>
+  >,
+  Simplify<M27C>,
+  Simplify<
+    EnvOf<M1> &
+      EnvOf<M2> &
+      EnvOf<M3> &
+      EnvOf<M4> &
+      EnvOf<M5> &
+      EnvOf<M6> &
+      EnvOf<M7> &
+      EnvOf<M8> &
+      EnvOf<M9> &
+      EnvOf<M10> &
+      EnvOf<M11> &
+      EnvOf<M12> &
+      EnvOf<M13> &
+      EnvOf<M14> &
+      EnvOf<M15> &
+      EnvOf<M16> &
+      EnvOf<M17> &
+      EnvOf<M18> &
+      EnvOf<M19> &
+      EnvOf<M20> &
+      EnvOf<M21> &
+      EnvOf<M22> &
+      EnvOf<M23> &
+      EnvOf<M24> &
+      EnvOf<M25> &
+      EnvOf<M26> &
+      EnvOf<M27>
+  >
+>
+
+declare function composeMiddleware<
+  M1 extends Middleware<any, any, any>,
+  M1R extends RequiredContextOf<M1>,
+  M1C extends AddedContextOf<M1>,
+  M2 extends Middleware<any, any, any>,
+  M2R extends Satisfy<RequiredContextOf<M2>, M1C>,
+  M2C extends AddedContextOf<M2> & M1C,
+  M3 extends Middleware<any, any, any>,
+  M3R extends Satisfy<RequiredContextOf<M3>, M2C>,
+  M3C extends AddedContextOf<M3> & M2C,
+  M4 extends Middleware<any, any, any>,
+  M4R extends Satisfy<RequiredContextOf<M4>, M3C>,
+  M4C extends AddedContextOf<M4> & M3C,
+  M5 extends Middleware<any, any, any>,
+  M5R extends Satisfy<RequiredContextOf<M5>, M4C>,
+  M5C extends AddedContextOf<M5> & M4C,
+  M6 extends Middleware<any, any, any>,
+  M6R extends Satisfy<RequiredContextOf<M6>, M5C>,
+  M6C extends AddedContextOf<M6> & M5C,
+  M7 extends Middleware<any, any, any>,
+  M7R extends Satisfy<RequiredContextOf<M7>, M6C>,
+  M7C extends AddedContextOf<M7> & M6C,
+  M8 extends Middleware<any, any, any>,
+  M8R extends Satisfy<RequiredContextOf<M8>, M7C>,
+  M8C extends AddedContextOf<M8> & M7C,
+  M9 extends Middleware<any, any, any>,
+  M9R extends Satisfy<RequiredContextOf<M9>, M8C>,
+  M9C extends AddedContextOf<M9> & M8C,
+  M10 extends Middleware<any, any, any>,
+  M10R extends Satisfy<RequiredContextOf<M10>, M9C>,
+  M10C extends AddedContextOf<M10> & M9C,
+  M11 extends Middleware<any, any, any>,
+  M11R extends Satisfy<RequiredContextOf<M11>, M10C>,
+  M11C extends AddedContextOf<M11> & M10C,
+  M12 extends Middleware<any, any, any>,
+  M12R extends Satisfy<RequiredContextOf<M12>, M11C>,
+  M12C extends AddedContextOf<M12> & M11C,
+  M13 extends Middleware<any, any, any>,
+  M13R extends Satisfy<RequiredContextOf<M13>, M12C>,
+  M13C extends AddedContextOf<M13> & M12C,
+  M14 extends Middleware<any, any, any>,
+  M14R extends Satisfy<RequiredContextOf<M14>, M13C>,
+  M14C extends AddedContextOf<M14> & M13C,
+  M15 extends Middleware<any, any, any>,
+  M15R extends Satisfy<RequiredContextOf<M15>, M14C>,
+  M15C extends AddedContextOf<M15> & M14C,
+  M16 extends Middleware<any, any, any>,
+  M16R extends Satisfy<RequiredContextOf<M16>, M15C>,
+  M16C extends AddedContextOf<M16> & M15C,
+  M17 extends Middleware<any, any, any>,
+  M17R extends Satisfy<RequiredContextOf<M17>, M16C>,
+  M17C extends AddedContextOf<M17> & M16C,
+  M18 extends Middleware<any, any, any>,
+  M18R extends Satisfy<RequiredContextOf<M18>, M17C>,
+  M18C extends AddedContextOf<M18> & M17C,
+  M19 extends Middleware<any, any, any>,
+  M19R extends Satisfy<RequiredContextOf<M19>, M18C>,
+  M19C extends AddedContextOf<M19> & M18C,
+  M20 extends Middleware<any, any, any>,
+  M20R extends Satisfy<RequiredContextOf<M20>, M19C>,
+  M20C extends AddedContextOf<M20> & M19C,
+  M21 extends Middleware<any, any, any>,
+  M21R extends Satisfy<RequiredContextOf<M21>, M20C>,
+  M21C extends AddedContextOf<M21> & M20C,
+  M22 extends Middleware<any, any, any>,
+  M22R extends Satisfy<RequiredContextOf<M22>, M21C>,
+  M22C extends AddedContextOf<M22> & M21C,
+  M23 extends Middleware<any, any, any>,
+  M23R extends Satisfy<RequiredContextOf<M23>, M22C>,
+  M23C extends AddedContextOf<M23> & M22C,
+  M24 extends Middleware<any, any, any>,
+  M24R extends Satisfy<RequiredContextOf<M24>, M23C>,
+  M24C extends AddedContextOf<M24> & M23C,
+  M25 extends Middleware<any, any, any>,
+  M25R extends Satisfy<RequiredContextOf<M25>, M24C>,
+  M25C extends AddedContextOf<M25> & M24C,
+  M26 extends Middleware<any, any, any>,
+  M26R extends Satisfy<RequiredContextOf<M26>, M25C>,
+  M26C extends AddedContextOf<M26> & M25C,
+  M27 extends Middleware<any, any, any>,
+  M27R extends Satisfy<RequiredContextOf<M27>, M26C>,
+  M27C extends AddedContextOf<M27> & M26C,
+  M28 extends Middleware<any, any, any>,
+  M28R extends Satisfy<RequiredContextOf<M28>, M27C>,
+  M28C extends AddedContextOf<M28> & M27C,
+>(
+  m1: M1,
+  m2: M2,
+  m3: M3,
+  m4: M4,
+  m5: M5,
+  m6: M6,
+  m7: M7,
+  m8: M8,
+  m9: M9,
+  m10: M10,
+  m11: M11,
+  m12: M12,
+  m13: M13,
+  m14: M14,
+  m15: M15,
+  m16: M16,
+  m17: M17,
+  m18: M18,
+  m19: M19,
+  m20: M20,
+  m21: M21,
+  m22: M22,
+  m23: M23,
+  m24: M24,
+  m25: M25,
+  m26: M26,
+  m27: M27,
+  m28: M28
+): Middleware<
+  Simplify<
+    RequiredContextOf<M1> &
+      Satisfy<RequiredContextOf<M2>, M1C> &
+      Satisfy<RequiredContextOf<M3>, M2C> &
+      Satisfy<RequiredContextOf<M4>, M3C> &
+      Satisfy<RequiredContextOf<M5>, M4C> &
+      Satisfy<RequiredContextOf<M6>, M5C> &
+      Satisfy<RequiredContextOf<M7>, M6C> &
+      Satisfy<RequiredContextOf<M8>, M7C> &
+      Satisfy<RequiredContextOf<M9>, M8C> &
+      Satisfy<RequiredContextOf<M10>, M9C> &
+      Satisfy<RequiredContextOf<M11>, M10C> &
+      Satisfy<RequiredContextOf<M12>, M11C> &
+      Satisfy<RequiredContextOf<M13>, M12C> &
+      Satisfy<RequiredContextOf<M14>, M13C> &
+      Satisfy<RequiredContextOf<M15>, M14C> &
+      Satisfy<RequiredContextOf<M16>, M15C> &
+      Satisfy<RequiredContextOf<M17>, M16C> &
+      Satisfy<RequiredContextOf<M18>, M17C> &
+      Satisfy<RequiredContextOf<M19>, M18C> &
+      Satisfy<RequiredContextOf<M20>, M19C> &
+      Satisfy<RequiredContextOf<M21>, M20C> &
+      Satisfy<RequiredContextOf<M22>, M21C> &
+      Satisfy<RequiredContextOf<M23>, M22C> &
+      Satisfy<RequiredContextOf<M24>, M23C> &
+      Satisfy<RequiredContextOf<M25>, M24C> &
+      Satisfy<RequiredContextOf<M26>, M25C> &
+      Satisfy<RequiredContextOf<M27>, M26C> &
+      Satisfy<RequiredContextOf<M28>, M27C>
+  >,
+  Simplify<M28C>,
+  Simplify<
+    EnvOf<M1> &
+      EnvOf<M2> &
+      EnvOf<M3> &
+      EnvOf<M4> &
+      EnvOf<M5> &
+      EnvOf<M6> &
+      EnvOf<M7> &
+      EnvOf<M8> &
+      EnvOf<M9> &
+      EnvOf<M10> &
+      EnvOf<M11> &
+      EnvOf<M12> &
+      EnvOf<M13> &
+      EnvOf<M14> &
+      EnvOf<M15> &
+      EnvOf<M16> &
+      EnvOf<M17> &
+      EnvOf<M18> &
+      EnvOf<M19> &
+      EnvOf<M20> &
+      EnvOf<M21> &
+      EnvOf<M22> &
+      EnvOf<M23> &
+      EnvOf<M24> &
+      EnvOf<M25> &
+      EnvOf<M26> &
+      EnvOf<M27> &
+      EnvOf<M28>
+  >
+>
+
+declare function composeMiddleware<
+  M1 extends Middleware<any, any, any>,
+  M1R extends RequiredContextOf<M1>,
+  M1C extends AddedContextOf<M1>,
+  M2 extends Middleware<any, any, any>,
+  M2R extends Satisfy<RequiredContextOf<M2>, M1C>,
+  M2C extends AddedContextOf<M2> & M1C,
+  M3 extends Middleware<any, any, any>,
+  M3R extends Satisfy<RequiredContextOf<M3>, M2C>,
+  M3C extends AddedContextOf<M3> & M2C,
+  M4 extends Middleware<any, any, any>,
+  M4R extends Satisfy<RequiredContextOf<M4>, M3C>,
+  M4C extends AddedContextOf<M4> & M3C,
+  M5 extends Middleware<any, any, any>,
+  M5R extends Satisfy<RequiredContextOf<M5>, M4C>,
+  M5C extends AddedContextOf<M5> & M4C,
+  M6 extends Middleware<any, any, any>,
+  M6R extends Satisfy<RequiredContextOf<M6>, M5C>,
+  M6C extends AddedContextOf<M6> & M5C,
+  M7 extends Middleware<any, any, any>,
+  M7R extends Satisfy<RequiredContextOf<M7>, M6C>,
+  M7C extends AddedContextOf<M7> & M6C,
+  M8 extends Middleware<any, any, any>,
+  M8R extends Satisfy<RequiredContextOf<M8>, M7C>,
+  M8C extends AddedContextOf<M8> & M7C,
+  M9 extends Middleware<any, any, any>,
+  M9R extends Satisfy<RequiredContextOf<M9>, M8C>,
+  M9C extends AddedContextOf<M9> & M8C,
+  M10 extends Middleware<any, any, any>,
+  M10R extends Satisfy<RequiredContextOf<M10>, M9C>,
+  M10C extends AddedContextOf<M10> & M9C,
+  M11 extends Middleware<any, any, any>,
+  M11R extends Satisfy<RequiredContextOf<M11>, M10C>,
+  M11C extends AddedContextOf<M11> & M10C,
+  M12 extends Middleware<any, any, any>,
+  M12R extends Satisfy<RequiredContextOf<M12>, M11C>,
+  M12C extends AddedContextOf<M12> & M11C,
+  M13 extends Middleware<any, any, any>,
+  M13R extends Satisfy<RequiredContextOf<M13>, M12C>,
+  M13C extends AddedContextOf<M13> & M12C,
+  M14 extends Middleware<any, any, any>,
+  M14R extends Satisfy<RequiredContextOf<M14>, M13C>,
+  M14C extends AddedContextOf<M14> & M13C,
+  M15 extends Middleware<any, any, any>,
+  M15R extends Satisfy<RequiredContextOf<M15>, M14C>,
+  M15C extends AddedContextOf<M15> & M14C,
+  M16 extends Middleware<any, any, any>,
+  M16R extends Satisfy<RequiredContextOf<M16>, M15C>,
+  M16C extends AddedContextOf<M16> & M15C,
+  M17 extends Middleware<any, any, any>,
+  M17R extends Satisfy<RequiredContextOf<M17>, M16C>,
+  M17C extends AddedContextOf<M17> & M16C,
+  M18 extends Middleware<any, any, any>,
+  M18R extends Satisfy<RequiredContextOf<M18>, M17C>,
+  M18C extends AddedContextOf<M18> & M17C,
+  M19 extends Middleware<any, any, any>,
+  M19R extends Satisfy<RequiredContextOf<M19>, M18C>,
+  M19C extends AddedContextOf<M19> & M18C,
+  M20 extends Middleware<any, any, any>,
+  M20R extends Satisfy<RequiredContextOf<M20>, M19C>,
+  M20C extends AddedContextOf<M20> & M19C,
+  M21 extends Middleware<any, any, any>,
+  M21R extends Satisfy<RequiredContextOf<M21>, M20C>,
+  M21C extends AddedContextOf<M21> & M20C,
+  M22 extends Middleware<any, any, any>,
+  M22R extends Satisfy<RequiredContextOf<M22>, M21C>,
+  M22C extends AddedContextOf<M22> & M21C,
+  M23 extends Middleware<any, any, any>,
+  M23R extends Satisfy<RequiredContextOf<M23>, M22C>,
+  M23C extends AddedContextOf<M23> & M22C,
+  M24 extends Middleware<any, any, any>,
+  M24R extends Satisfy<RequiredContextOf<M24>, M23C>,
+  M24C extends AddedContextOf<M24> & M23C,
+  M25 extends Middleware<any, any, any>,
+  M25R extends Satisfy<RequiredContextOf<M25>, M24C>,
+  M25C extends AddedContextOf<M25> & M24C,
+  M26 extends Middleware<any, any, any>,
+  M26R extends Satisfy<RequiredContextOf<M26>, M25C>,
+  M26C extends AddedContextOf<M26> & M25C,
+  M27 extends Middleware<any, any, any>,
+  M27R extends Satisfy<RequiredContextOf<M27>, M26C>,
+  M27C extends AddedContextOf<M27> & M26C,
+  M28 extends Middleware<any, any, any>,
+  M28R extends Satisfy<RequiredContextOf<M28>, M27C>,
+  M28C extends AddedContextOf<M28> & M27C,
+  M29 extends Middleware<any, any, any>,
+  M29R extends Satisfy<RequiredContextOf<M29>, M28C>,
+  M29C extends AddedContextOf<M29> & M28C,
+>(
+  m1: M1,
+  m2: M2,
+  m3: M3,
+  m4: M4,
+  m5: M5,
+  m6: M6,
+  m7: M7,
+  m8: M8,
+  m9: M9,
+  m10: M10,
+  m11: M11,
+  m12: M12,
+  m13: M13,
+  m14: M14,
+  m15: M15,
+  m16: M16,
+  m17: M17,
+  m18: M18,
+  m19: M19,
+  m20: M20,
+  m21: M21,
+  m22: M22,
+  m23: M23,
+  m24: M24,
+  m25: M25,
+  m26: M26,
+  m27: M27,
+  m28: M28,
+  m29: M29
+): Middleware<
+  Simplify<
+    RequiredContextOf<M1> &
+      Satisfy<RequiredContextOf<M2>, M1C> &
+      Satisfy<RequiredContextOf<M3>, M2C> &
+      Satisfy<RequiredContextOf<M4>, M3C> &
+      Satisfy<RequiredContextOf<M5>, M4C> &
+      Satisfy<RequiredContextOf<M6>, M5C> &
+      Satisfy<RequiredContextOf<M7>, M6C> &
+      Satisfy<RequiredContextOf<M8>, M7C> &
+      Satisfy<RequiredContextOf<M9>, M8C> &
+      Satisfy<RequiredContextOf<M10>, M9C> &
+      Satisfy<RequiredContextOf<M11>, M10C> &
+      Satisfy<RequiredContextOf<M12>, M11C> &
+      Satisfy<RequiredContextOf<M13>, M12C> &
+      Satisfy<RequiredContextOf<M14>, M13C> &
+      Satisfy<RequiredContextOf<M15>, M14C> &
+      Satisfy<RequiredContextOf<M16>, M15C> &
+      Satisfy<RequiredContextOf<M17>, M16C> &
+      Satisfy<RequiredContextOf<M18>, M17C> &
+      Satisfy<RequiredContextOf<M19>, M18C> &
+      Satisfy<RequiredContextOf<M20>, M19C> &
+      Satisfy<RequiredContextOf<M21>, M20C> &
+      Satisfy<RequiredContextOf<M22>, M21C> &
+      Satisfy<RequiredContextOf<M23>, M22C> &
+      Satisfy<RequiredContextOf<M24>, M23C> &
+      Satisfy<RequiredContextOf<M25>, M24C> &
+      Satisfy<RequiredContextOf<M26>, M25C> &
+      Satisfy<RequiredContextOf<M27>, M26C> &
+      Satisfy<RequiredContextOf<M28>, M27C> &
+      Satisfy<RequiredContextOf<M29>, M28C>
+  >,
+  Simplify<M29C>,
+  Simplify<
+    EnvOf<M1> &
+      EnvOf<M2> &
+      EnvOf<M3> &
+      EnvOf<M4> &
+      EnvOf<M5> &
+      EnvOf<M6> &
+      EnvOf<M7> &
+      EnvOf<M8> &
+      EnvOf<M9> &
+      EnvOf<M10> &
+      EnvOf<M11> &
+      EnvOf<M12> &
+      EnvOf<M13> &
+      EnvOf<M14> &
+      EnvOf<M15> &
+      EnvOf<M16> &
+      EnvOf<M17> &
+      EnvOf<M18> &
+      EnvOf<M19> &
+      EnvOf<M20> &
+      EnvOf<M21> &
+      EnvOf<M22> &
+      EnvOf<M23> &
+      EnvOf<M24> &
+      EnvOf<M25> &
+      EnvOf<M26> &
+      EnvOf<M27> &
+      EnvOf<M28> &
+      EnvOf<M29>
+  >
+>
+
+declare function composeMiddleware<
+  M1 extends Middleware<any, any, any>,
+  M1R extends RequiredContextOf<M1>,
+  M1C extends AddedContextOf<M1>,
+  M2 extends Middleware<any, any, any>,
+  M2R extends Satisfy<RequiredContextOf<M2>, M1C>,
+  M2C extends AddedContextOf<M2> & M1C,
+  M3 extends Middleware<any, any, any>,
+  M3R extends Satisfy<RequiredContextOf<M3>, M2C>,
+  M3C extends AddedContextOf<M3> & M2C,
+  M4 extends Middleware<any, any, any>,
+  M4R extends Satisfy<RequiredContextOf<M4>, M3C>,
+  M4C extends AddedContextOf<M4> & M3C,
+  M5 extends Middleware<any, any, any>,
+  M5R extends Satisfy<RequiredContextOf<M5>, M4C>,
+  M5C extends AddedContextOf<M5> & M4C,
+  M6 extends Middleware<any, any, any>,
+  M6R extends Satisfy<RequiredContextOf<M6>, M5C>,
+  M6C extends AddedContextOf<M6> & M5C,
+  M7 extends Middleware<any, any, any>,
+  M7R extends Satisfy<RequiredContextOf<M7>, M6C>,
+  M7C extends AddedContextOf<M7> & M6C,
+  M8 extends Middleware<any, any, any>,
+  M8R extends Satisfy<RequiredContextOf<M8>, M7C>,
+  M8C extends AddedContextOf<M8> & M7C,
+  M9 extends Middleware<any, any, any>,
+  M9R extends Satisfy<RequiredContextOf<M9>, M8C>,
+  M9C extends AddedContextOf<M9> & M8C,
+  M10 extends Middleware<any, any, any>,
+  M10R extends Satisfy<RequiredContextOf<M10>, M9C>,
+  M10C extends AddedContextOf<M10> & M9C,
+  M11 extends Middleware<any, any, any>,
+  M11R extends Satisfy<RequiredContextOf<M11>, M10C>,
+  M11C extends AddedContextOf<M11> & M10C,
+  M12 extends Middleware<any, any, any>,
+  M12R extends Satisfy<RequiredContextOf<M12>, M11C>,
+  M12C extends AddedContextOf<M12> & M11C,
+  M13 extends Middleware<any, any, any>,
+  M13R extends Satisfy<RequiredContextOf<M13>, M12C>,
+  M13C extends AddedContextOf<M13> & M12C,
+  M14 extends Middleware<any, any, any>,
+  M14R extends Satisfy<RequiredContextOf<M14>, M13C>,
+  M14C extends AddedContextOf<M14> & M13C,
+  M15 extends Middleware<any, any, any>,
+  M15R extends Satisfy<RequiredContextOf<M15>, M14C>,
+  M15C extends AddedContextOf<M15> & M14C,
+  M16 extends Middleware<any, any, any>,
+  M16R extends Satisfy<RequiredContextOf<M16>, M15C>,
+  M16C extends AddedContextOf<M16> & M15C,
+  M17 extends Middleware<any, any, any>,
+  M17R extends Satisfy<RequiredContextOf<M17>, M16C>,
+  M17C extends AddedContextOf<M17> & M16C,
+  M18 extends Middleware<any, any, any>,
+  M18R extends Satisfy<RequiredContextOf<M18>, M17C>,
+  M18C extends AddedContextOf<M18> & M17C,
+  M19 extends Middleware<any, any, any>,
+  M19R extends Satisfy<RequiredContextOf<M19>, M18C>,
+  M19C extends AddedContextOf<M19> & M18C,
+  M20 extends Middleware<any, any, any>,
+  M20R extends Satisfy<RequiredContextOf<M20>, M19C>,
+  M20C extends AddedContextOf<M20> & M19C,
+  M21 extends Middleware<any, any, any>,
+  M21R extends Satisfy<RequiredContextOf<M21>, M20C>,
+  M21C extends AddedContextOf<M21> & M20C,
+  M22 extends Middleware<any, any, any>,
+  M22R extends Satisfy<RequiredContextOf<M22>, M21C>,
+  M22C extends AddedContextOf<M22> & M21C,
+  M23 extends Middleware<any, any, any>,
+  M23R extends Satisfy<RequiredContextOf<M23>, M22C>,
+  M23C extends AddedContextOf<M23> & M22C,
+  M24 extends Middleware<any, any, any>,
+  M24R extends Satisfy<RequiredContextOf<M24>, M23C>,
+  M24C extends AddedContextOf<M24> & M23C,
+  M25 extends Middleware<any, any, any>,
+  M25R extends Satisfy<RequiredContextOf<M25>, M24C>,
+  M25C extends AddedContextOf<M25> & M24C,
+  M26 extends Middleware<any, any, any>,
+  M26R extends Satisfy<RequiredContextOf<M26>, M25C>,
+  M26C extends AddedContextOf<M26> & M25C,
+  M27 extends Middleware<any, any, any>,
+  M27R extends Satisfy<RequiredContextOf<M27>, M26C>,
+  M27C extends AddedContextOf<M27> & M26C,
+  M28 extends Middleware<any, any, any>,
+  M28R extends Satisfy<RequiredContextOf<M28>, M27C>,
+  M28C extends AddedContextOf<M28> & M27C,
+  M29 extends Middleware<any, any, any>,
+  M29R extends Satisfy<RequiredContextOf<M29>, M28C>,
+  M29C extends AddedContextOf<M29> & M28C,
+  M30 extends Middleware<any, any, any>,
+  M30R extends Satisfy<RequiredContextOf<M30>, M29C>,
+  M30C extends AddedContextOf<M30> & M29C,
+>(
+  m1: M1,
+  m2: M2,
+  m3: M3,
+  m4: M4,
+  m5: M5,
+  m6: M6,
+  m7: M7,
+  m8: M8,
+  m9: M9,
+  m10: M10,
+  m11: M11,
+  m12: M12,
+  m13: M13,
+  m14: M14,
+  m15: M15,
+  m16: M16,
+  m17: M17,
+  m18: M18,
+  m19: M19,
+  m20: M20,
+  m21: M21,
+  m22: M22,
+  m23: M23,
+  m24: M24,
+  m25: M25,
+  m26: M26,
+  m27: M27,
+  m28: M28,
+  m29: M29,
+  m30: M30
+): Middleware<
+  Simplify<
+    RequiredContextOf<M1> &
+      Satisfy<RequiredContextOf<M2>, M1C> &
+      Satisfy<RequiredContextOf<M3>, M2C> &
+      Satisfy<RequiredContextOf<M4>, M3C> &
+      Satisfy<RequiredContextOf<M5>, M4C> &
+      Satisfy<RequiredContextOf<M6>, M5C> &
+      Satisfy<RequiredContextOf<M7>, M6C> &
+      Satisfy<RequiredContextOf<M8>, M7C> &
+      Satisfy<RequiredContextOf<M9>, M8C> &
+      Satisfy<RequiredContextOf<M10>, M9C> &
+      Satisfy<RequiredContextOf<M11>, M10C> &
+      Satisfy<RequiredContextOf<M12>, M11C> &
+      Satisfy<RequiredContextOf<M13>, M12C> &
+      Satisfy<RequiredContextOf<M14>, M13C> &
+      Satisfy<RequiredContextOf<M15>, M14C> &
+      Satisfy<RequiredContextOf<M16>, M15C> &
+      Satisfy<RequiredContextOf<M17>, M16C> &
+      Satisfy<RequiredContextOf<M18>, M17C> &
+      Satisfy<RequiredContextOf<M19>, M18C> &
+      Satisfy<RequiredContextOf<M20>, M19C> &
+      Satisfy<RequiredContextOf<M21>, M20C> &
+      Satisfy<RequiredContextOf<M22>, M21C> &
+      Satisfy<RequiredContextOf<M23>, M22C> &
+      Satisfy<RequiredContextOf<M24>, M23C> &
+      Satisfy<RequiredContextOf<M25>, M24C> &
+      Satisfy<RequiredContextOf<M26>, M25C> &
+      Satisfy<RequiredContextOf<M27>, M26C> &
+      Satisfy<RequiredContextOf<M28>, M27C> &
+      Satisfy<RequiredContextOf<M29>, M28C> &
+      Satisfy<RequiredContextOf<M30>, M29C>
+  >,
+  Simplify<M30C>,
+  Simplify<
+    EnvOf<M1> &
+      EnvOf<M2> &
+      EnvOf<M3> &
+      EnvOf<M4> &
+      EnvOf<M5> &
+      EnvOf<M6> &
+      EnvOf<M7> &
+      EnvOf<M8> &
+      EnvOf<M9> &
+      EnvOf<M10> &
+      EnvOf<M11> &
+      EnvOf<M12> &
+      EnvOf<M13> &
+      EnvOf<M14> &
+      EnvOf<M15> &
+      EnvOf<M16> &
+      EnvOf<M17> &
+      EnvOf<M18> &
+      EnvOf<M19> &
+      EnvOf<M20> &
+      EnvOf<M21> &
+      EnvOf<M22> &
+      EnvOf<M23> &
+      EnvOf<M24> &
+      EnvOf<M25> &
+      EnvOf<M26> &
+      EnvOf<M27> &
+      EnvOf<M28> &
+      EnvOf<M29> &
+      EnvOf<M30>
+  >
 >
 
 export { composeMiddleware }

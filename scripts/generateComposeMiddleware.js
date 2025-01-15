@@ -3,7 +3,7 @@ import ts from 'typescript'
 import * as prettier from 'prettier'
 
 // The maximum number of arguments to generate overloads for.
-const MAX_ARGUMENTS = 20
+const MAX_ARGUMENTS = 30
 
 /**
  * Simply passes the value {@link x} to the function {@param fn} and returns the
@@ -40,7 +40,7 @@ const declarations = [
       EnvOf,
       Middleware,
       RequiredContextOf,
-    } from './bindings'
+    } from './bindings.js'
 
     /**
      * Returns the result of satisfying the {@link Requirements} with the
@@ -50,6 +50,12 @@ const declarations = [
       With extends Pick<Requirements, keyof Requirements & keyof With>
         ? Omit<Requirements, keyof With>
         : never
+
+    /**
+     * Forces TypeScript to resolve a complex type into a simple single object
+     * type. This makes the type of a composed middleware much easier to read.
+     */
+    type Simplify<T> = {[KeyType in keyof T]: T[KeyType]} & {};
   `,
 
   /* typescript */ `
@@ -87,6 +93,7 @@ function createComposeMiddlewareOverloadDeclaration (argCount) {
     undefined,
     'composeMiddleware',
     [
+      // Type parameters
       ...ns.flatMap((n) => {
         return [
           ts.factory.createTypeParameterDeclaration(
@@ -125,6 +132,8 @@ function createComposeMiddlewareOverloadDeclaration (argCount) {
         ]
       })
     ],
+
+    // Function parameters
     ns.map((n) =>
       ts.factory.createParameterDeclaration(
         undefined,
@@ -135,31 +144,39 @@ function createComposeMiddlewareOverloadDeclaration (argCount) {
         undefined
       )
     ),
+
+    // Return type
     ts.factory.createTypeReferenceNode('Middleware', [
-      ts.factory.createIntersectionTypeNode(
-        ns.map((n) =>
-          withBinding(
-            ts.factory.createTypeReferenceNode('RequiredContextOf', [
-              ts.factory.createTypeReferenceNode(`M${n}`)
-            ]),
-            (requiredContext) =>
-              n === 1
-                ? requiredContext
-                : ts.factory.createTypeReferenceNode('Satisfy', [
-                  requiredContext,
-                  ts.factory.createTypeReferenceNode(`M${n - 1}C`)
-                ])
+      ts.factory.createTypeReferenceNode('Simplify', [
+        ts.factory.createIntersectionTypeNode(
+          ns.map((n) =>
+            withBinding(
+              ts.factory.createTypeReferenceNode('RequiredContextOf', [
+                ts.factory.createTypeReferenceNode(`M${n}`)
+              ]),
+              (requiredContext) =>
+                n === 1
+                  ? requiredContext
+                  : ts.factory.createTypeReferenceNode('Satisfy', [
+                    requiredContext,
+                    ts.factory.createTypeReferenceNode(`M${n - 1}C`)
+                  ])
+            )
           )
         )
-      ),
-      ts.factory.createTypeReferenceNode(`M${ns[ns.length - 1]}C`),
-      ts.factory.createIntersectionTypeNode(
-        ns.map((n) =>
-          ts.factory.createTypeReferenceNode('EnvOf', [
-            ts.factory.createTypeReferenceNode(`M${n}`)
-          ])
+      ]),
+      ts.factory.createTypeReferenceNode('Simplify', [
+        ts.factory.createTypeReferenceNode(`M${ns[ns.length - 1]}C`)
+      ]),
+      ts.factory.createTypeReferenceNode('Simplify', [
+        ts.factory.createIntersectionTypeNode(
+          ns.map((n) =>
+            ts.factory.createTypeReferenceNode('EnvOf', [
+              ts.factory.createTypeReferenceNode(`M${n}`)
+            ])
+          )
         )
-      )
+      ])
     ]),
     undefined
   )
