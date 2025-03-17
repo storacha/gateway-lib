@@ -50,6 +50,28 @@ export async function handleUnixfsDir (request, env, ctx) {
   if (!entry.type.includes('directory')) throw new Error('non UnixFS directory entry')
   if (!unixfs) throw new Error('missing UnixFS service')
 
+  const headers = {
+    'Content-Type': 'text/html',
+    Etag: `"DirIndex-gateway-lib@2.0.3_CID-${entry.cid}"`
+  }
+
+  if (request.method === 'HEAD') {
+    return new Response(null, { headers })
+  }
+  if (request.method !== 'GET') {
+    throw new HttpError('method not allowed', { status: 405 })
+  }
+
+  const url = new URL(request.url)
+
+  // redirect directory missing trailing slash
+  if (!url.pathname.endsWith('/')) {
+    return new Response(null, {
+      status: 301,
+      headers: { Location: `${url.pathname}/${url.search}` }
+    })
+  }
+
   // serve index.html if directory contains one
   try {
     const indexPath = `${dataCid}${path}${path.endsWith('/') ? '' : '/'}index.html`
@@ -60,19 +82,7 @@ export async function handleUnixfsDir (request, env, ctx) {
     if (err.code !== 'ERR_NOT_FOUND') throw err
   }
 
-  const headers = {
-    'Content-Type': 'text/html',
-    Etag: `"DirIndex-gateway-lib@2.0.2_CID-${entry.cid}"`
-  }
-
-  if (request.method === 'HEAD') {
-    return new Response(null, { headers })
-  }
-  if (request.method !== 'GET') {
-    throw new HttpError('method not allowed', { status: 405 })
-  }
-
-  const isSubdomain = new URL(request.url).hostname.includes('.ipfs.')
+  const isSubdomain = url.hostname.includes('.ipfs.')
   /** @param {string} p CID path like "<cid>[/optional/path]" */
   const entryPath = p => isSubdomain ? p.split('/').slice(1).join('/') : `/ipfs/${p}`
 

@@ -26,9 +26,34 @@ describe('UnixFS directory handler', () => {
     const dagula = new Dagula(blockstore)
     const ctx = { waitUntil, unixfs: dagula, dataCid: dirBlock.cid, path, searchParams }
     const env = { DEBUG: 'true' }
-    const req = new Request('http://localhost/ipfs/bafy')
+    const req = new Request('http://localhost/ipfs/bafy/')
     const res = await handleUnixfs(req, env, ctx)
     const html = await res.text()
     assert(html.includes('Puzzle%20People%20%231.png'))
+  })
+
+  it('redirects missing trailing slash', async () => {
+    const waitUntil = mockWaitUntil()
+    const path = '/test'
+    const searchParams = new URLSearchParams()
+    const fileBlock = await encode({ value: fromString('test'), codec: raw, hasher })
+    const dirData = pb.createNode(new UnixFS({ type: 'directory' }).marshal(), [{
+      Name: 'Puzzle People #1.png',
+      Hash: fileBlock.cid
+    }])
+    const dirBlock = await encode({ value: dirData, codec: pb, hasher })
+    const rootDirData = pb.createNode(new UnixFS({ type: 'directory' }).marshal(), [{
+      Name: 'test',
+      Hash: dirBlock.cid
+    }])
+    const rootDirBlock = await encode({ value: rootDirData, codec: pb, hasher })
+    const blockstore = mockBlockstore([rootDirBlock, dirBlock, fileBlock])
+    const dagula = new Dagula(blockstore)
+    const ctx = { waitUntil, unixfs: dagula, dataCid: rootDirBlock.cid, path, searchParams }
+    const env = { DEBUG: 'true' }
+    const req = new Request('http://localhost/ipfs/bafy/test')
+    const res = await handleUnixfs(req, env, ctx)
+    assert.equal(res.status, 301)
+    assert.equal(res.headers.get('location'), '/ipfs/bafy/test/')
   })
 })
