@@ -1,5 +1,12 @@
 # Changelog
 
+## [5.1.3](https://github.com/storacha/gateway-lib/compare/v5.1.2...v5.1.3) (2025-07-11)
+
+
+### Bug Fixes
+
+* redirect directory missing trailing slash ([#66](https://github.com/storacha/gateway-lib/issues/66)) ([7ace384](https://github.com/storacha/gateway-lib/commit/7ace384789a9fd39c284ea10a83840b21dfbdbd9))
+
 ## [5.1.2](https://github.com/storacha/gateway-lib/compare/v5.1.1...v5.1.2) (2024-09-10)
 
 
