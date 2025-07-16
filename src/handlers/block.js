@@ -4,10 +4,10 @@ import { decodeRangeHeader, resolveRange } from '../util/range.js'
 import { HttpError } from '../util/errors.js'
 
 /**
- * @typedef {import('../bindings.js').IpfsUrlContext & import('../bindings.js').BlockContext & import('../bindings.js').UnixfsContext & { timeoutController?: import('../bindings.js').TimeoutControllerContext['timeoutController'] }} BlockHandlerContext
+ * @import { IpfsUrlContext, BlockContext, UnixfsContext, TimeoutControllerContext, Handler } from '../bindings.js'
  */
 
-/** @type {import('../bindings.js').Handler<BlockHandlerContext>} */
+/** @type {Handler<IpfsUrlContext & BlockContext & UnixfsContext & Partial<TimeoutControllerContext>>} */
 export async function handleBlock (request, env, ctx) {
   const { dataCid, path, timeoutController: controller, blocks, unixfs, searchParams } = ctx
   if (!dataCid) throw new Error('missing IPFS path')

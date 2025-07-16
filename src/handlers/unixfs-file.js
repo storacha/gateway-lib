@@ -5,10 +5,11 @@ import { HttpError } from '../util/errors.js'
 import { decodeRangeHeader, resolveRange } from '../util/range.js'
 
 /**
- * @typedef {import('../bindings.js').UnixfsEntryContext} UnixfsFileHandlerContext
+ * @import { UnixfsEntryContext, Handler } from '../bindings.js'
+ * @import { AbsoluteRange, Range } from 'dagula'
  */
 
-/** @type {import('../bindings.js').Handler<UnixfsFileHandlerContext>} */
+/** @type {Handler<UnixfsEntryContext>} */
 export async function handleUnixfsFile (request, env, ctx) {
   const { unixfsEntry: entry } = ctx
   if (!entry) throw new Error('missing UnixFS entry')
@@ -35,10 +36,10 @@ export async function handleUnixfsFile (request, env, ctx) {
     throw new HttpError('method not allowed', { status: 405 })
   }
 
-  /** @type {import('dagula').AbsoluteRange|undefined} */
+  /** @type {AbsoluteRange|undefined} */
   let range
   if (request.headers.has('range')) {
-    /** @type {import('dagula').Range[]} */
+    /** @type {Range[]} */
     let ranges = []
     try {
       ranges = decodeRangeHeader(request.headers.get('range') ?? '')
@@ -80,7 +81,6 @@ export async function handleUnixfsFile (request, env, ctx) {
     let bytesWritten = firstChunk.length
     yield firstChunk
     try {
-      // @ts-ignore
       for await (const chunk of contentIterator) {
         bytesWritten += chunk.length
         yield chunk

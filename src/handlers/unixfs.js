@@ -4,10 +4,10 @@ import { handleUnixfsFile } from './unixfs-file.js'
 import { HttpError } from '../util/errors.js'
 
 /**
- * @typedef {import('../bindings.js').IpfsUrlContext & import('../bindings.js').UnixfsContext & { timeoutController?: import('../bindings.js').TimeoutControllerContext['timeoutController'] }} UnixfsHandlerContext
+ * @import { IpfsUrlContext, UnixfsContext, TimeoutControllerContext, Handler } from '../bindings.js'
  */
 
-/** @type {import('../bindings.js').Handler<UnixfsHandlerContext>} */
+/** @type {Handler<IpfsUrlContext & UnixfsContext & Partial<TimeoutControllerContext>>} */
 export async function handleUnixfs (request, env, ctx) {
   const { dataCid, path, timeoutController: controller, unixfs } = ctx
   if (!dataCid) throw new Error('missing data CID')

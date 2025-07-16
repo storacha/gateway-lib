@@ -4,15 +4,18 @@ import { toReadableStream } from '../util/streams.js'
 import { HttpError } from '../util/errors.js'
 
 /**
- * @typedef {import('../bindings.js').IpfsUrlContext & import('../bindings.js').DagContext  & { timeoutController?: import('../bindings.js').TimeoutControllerContext['timeoutController'] }} CarHandlerContext
- * @typedef {import('multiformats').CID} CID
- * @typedef {{ version: 1|2, order: import('dagula').BlockOrder, dups: boolean }} CarParams
+ * @import { IpfsUrlContext, DagContext, TimeoutControllerContext, Handler } from '../bindings.js'
+ * @import { BlockOrder, DagScope, Range } from 'dagula'
+ */
+
+/**
+ * @typedef {{ version: 1|2, order: BlockOrder, dups: boolean }} CarParams
  */
 
 /** @type {CarParams} */
-const DefaultCarParams = { version: 1, order: 'unk', dups: true }
+const defaultCarParams = { version: 1, order: 'unk', dups: true }
 
-/** @type {import('../bindings.js').Handler<CarHandlerContext>} */
+/** @type {Handler<IpfsUrlContext & DagContext & Partial<TimeoutControllerContext>>} */
 export async function handleCar (request, env, ctx) {
   const { dataCid, path, timeoutController: controller, dag, searchParams } = ctx
   if (!dataCid) throw new Error('missing IPFS path')
@@ -75,7 +78,7 @@ export async function handleCar (request, env, ctx) {
 
 /**
  * @param {URLSearchParams} searchParams
- * @returns {import('dagula').DagScope}
+ * @returns {DagScope}
  */
 function getDagScope (searchParams) {
   const scope = searchParams.get('dag-scope') ?? 'all'
@@ -87,7 +90,7 @@ function getDagScope (searchParams) {
 
 /**
  * @param {URLSearchParams} searchParams
- * @returns {import('dagula').Range|undefined}
+ * @returns {Range|undefined}
  */
 function getEntityBytes (searchParams) {
   const value = searchParams.get('entity-bytes')
@@ -118,11 +121,11 @@ function getEntityBytes (searchParams) {
  */
 function getAcceptParams (headers) {
   const accept = headers.get('accept')
-  if (!accept) return DefaultCarParams
+  if (!accept) return defaultCarParams
 
   const types = accept.split(',').map(s => s.trim())
   const carType = types.find(t => t.startsWith('application/vnd.ipld.car'))
-  if (!carType) return DefaultCarParams
+  if (!carType) return defaultCarParams
 
   const paramPairs = carType.split(';').slice(1).map(s => s.trim())
   const { version, order, dups } = Object.fromEntries(paramPairs.map(p => p.split('=').map(s => s.trim())))

@@ -49,8 +49,10 @@
   },
   "scripts": {
     "prepare": "npm run build",
-    "test": "node --test test/**/*.spec.js",
+    "test": "tsx --test test/**/*.spec.[jt]s",
     "lint": "standard",
+    "generate-compose": "node scripts/generateComposeMiddleware.js",
+    "generate-compose:watch": "node --watch scripts/generateComposeMiddleware.js",
     "build": "npm run build:types && npm run build:templates",
     "build:types": "tsc && cp src/bindings.d.ts types/bindings.d.ts",
     "build:templates": "rm -f src/handlers/templates/bundle.cjs && echo '// @ts-nocheck' >> src/handlers/templates/bundle.cjs && handlebars src/handlers/templates/*.handlebars -c @web3-storage/handlebars/runtime.js >> src/handlers/templates/bundle.cjs",
@@ -82,10 +84,13 @@
     "@ipld/dag-cbor": "^9.0.8",
     "@ipld/dag-pb": "^4.0.8",
     "@types/bytes": "^3.1.4",
+    "expect-type": "^1.1.0",
     "ipfs-unixfs": "^11.1.2",
     "ipfs-unixfs-exporter": "^13.3.0",
+    "prettier": "^3.4.2",
     "standard": "^17.1.0",
-    "typescript": "^5.3.3"
+    "tsx": "^4.19.2",
+    "typescript": "^5.7.3"
   },
   "publishConfig": {
     "access": "public"
@@ -105,5 +110,11 @@
     "ignore": [
       "*.ts"
     ]
+  },
+  "prettier": {
+    "trailingComma": "es5",
+    "tabWidth": 2,
+    "semi": false,
+    "singleQuote": true
   }
 }
