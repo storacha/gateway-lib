@@ -1,5 +1,12 @@
 # Changelog
 
+## [5.2.0](https://github.com/storacha/gateway-lib/compare/v5.1.3...v5.2.0) (2025-09-10)
+
+
+### Features
+
+* support `dag-json` and `dag-cbor` preview rendering ([#68](https://github.com/storacha/gateway-lib/issues/68)) ([19274ec](https://github.com/storacha/gateway-lib/commit/19274ec63289308deecf3739f36f3f231bdb1a00))
+
 ## [5.1.3](https://github.com/storacha/gateway-lib/compare/v5.1.2...v5.1.3) (2025-07-11)
 
 
