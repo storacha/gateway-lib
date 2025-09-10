@@ -139,26 +139,3 @@
     </div>
   {{/if}}
 {{/inline}}
-
-{{!-- {{ define "value" }}
-  {{ $root := index . 0 }}
-  {{ $value := index . 1 }}
-  {{ if len $value.Values }}
-    <div class="grid dag">
-    {{ range $index, $key := $value.Keys }}
-      {{ template "value" (args $root $key) }}
-      {{ template "value" (args $root (index $value.Values $index)) }}
-    {{ end }}
-    </div>
-  {{ else }}
-    <div translate="no">
-      {{ with $value.CID }}<a class="ipfs-hash" href={{ if $root.DNSLink }}"https://cid.ipfs.tech/#{{ . | urlEscape}}" target="_blank" rel="noreferrer noopener"{{ else }}"{{ $root.GatewayURL }}/ipfs/{{ . | urlEscape}}"{{ end }}>{{ end }}
-        {{ if $value.Long }}
-          <pre>{{- $value.Value -}}</pre>
-        {{ else }}
-          <code class="nowrap">{{- $value.Value -}}</code>
-        {{ end }}
-      {{ with $value.CID }}</a>{{ end }}
-    </div>
-  {{ end }}
-{{ end }} --}}
