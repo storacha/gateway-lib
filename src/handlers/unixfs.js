@@ -26,7 +26,7 @@ export async function handleUnixfs (request, env, ctx) {
   const entry = await unixfs.getUnixfs(`${dataCid}${path}`, options)
 
   const { cid } = entry
-  if (cid.code == dagCBOR.code || cid.code == dagJSON.code) {
+  if (cid.code === dagCBOR.code || cid.code === dagJSON.code) {
     const block = { cid, bytes: concat(await collect(entry.content(options))) }
     return await handleBlockHtml(request, env, { ...ctx, block })
   }

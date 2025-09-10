@@ -12,7 +12,7 @@ import { hexdump } from '@gct256/hexdump'
 import { CID } from 'multiformats/cid'
 import { decodeRangeHeader, resolveRange } from '../util/range.js'
 import { HttpError } from '../util/errors.js'
-import { Handlebars, getTemplate, registerHelper } from '../util/handlebars.js'
+import { getTemplate, registerHelper } from '../util/handlebars.js'
 
 /**
  * @typedef {IpfsUrlContext & BlockContext & UnixfsContext & { timeoutController?: TimeoutController }} BlockHandlerContext
@@ -186,7 +186,7 @@ registerHelper('isIpldLink', isIpldLink)
 
 /** @param {unknown} obj */
 const isIpldMap = obj => {
-  return obj != null && typeof obj == 'object' && !isIpldScalar(obj) && !isIpldList(obj)
+  return obj != null && typeof obj === 'object' && !isIpldScalar(obj) && !isIpldList(obj)
 }
 registerHelper('isIpldMap', isIpldMap)
 
