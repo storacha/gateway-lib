@@ -248,5 +248,5 @@ export async function handleBlockHtml (request, env, ctx) {
     value: codec.decode(block.bytes)
   })
 
-  return new Response(html)
+  return new Response(html, { headers })
 }
