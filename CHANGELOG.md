@@ -1,5 +1,12 @@
 # Changelog
 
+## [5.2.2](https://github.com/storacha/gateway-lib/compare/v5.2.1...v5.2.2) (2025-09-10)
+
+
+### Bug Fixes
+
+* send content type header ([49fbaf4](https://github.com/storacha/gateway-lib/commit/49fbaf4a3d062fde91ec254f955e0f4745011d83))
+
 ## [5.2.1](https://github.com/storacha/gateway-lib/compare/v5.2.0...v5.2.1) (2025-09-10)
 
 
