@@ -79,7 +79,7 @@ export async function handleUnixfsDir (request, env, ctx) {
     const parts = entry.path.split('/')
     yield fromString(
       getTemplate('unixfs-dir-header')({
-        gatewayDomain: ctx.gatewayDomain ?? 'storacha.link',
+        gatewayDomain: ctx.gatewayDomain || 'storacha.link',
         path: entryPath(entry.path),
         name: entry.name,
         hash: entry.cid.toString(),
