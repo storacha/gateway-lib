@@ -1,5 +1,12 @@
 # Changelog
 
+## [5.2.1](https://github.com/storacha/gateway-lib/compare/v5.2.0...v5.2.1) (2025-09-10)
+
+
+### Bug Fixes
+
+* entry bytes is not yielded from content() ([08e0217](https://github.com/storacha/gateway-lib/commit/08e021743222354daa01cd3a953147de07c8d1dd))
+
 ## [5.2.0](https://github.com/storacha/gateway-lib/compare/v5.1.3...v5.2.0) (2025-09-10)
 
 
