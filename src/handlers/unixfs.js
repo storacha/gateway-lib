@@ -4,12 +4,10 @@
  */
 import * as dagJSON from '@ipld/dag-json'
 import * as dagCBOR from '@ipld/dag-cbor'
-import { concat } from 'uint8arrays'
 import { handleUnixfsDir } from './unixfs-dir.js'
 import { handleUnixfsFile } from './unixfs-file.js'
 import { handleBlockHtml } from './block.js'
 import { HttpError } from '../util/errors.js'
-import { collect } from '../util/streams.js'
 
 /**
  * @typedef {IpfsUrlContext & UnixfsContext & { timeoutController?: TimeoutController, gatewayDomain?: string }} UnixfsHandlerContext
@@ -27,7 +25,10 @@ export async function handleUnixfs (request, env, ctx) {
 
   const { cid } = entry
   if (cid.code === dagCBOR.code || cid.code === dagJSON.code) {
-    const block = { cid, bytes: concat(await collect(entry.content(options))) }
+    if (!(entry.node instanceof Uint8Array)) {
+      throw new Error(`unexpected non-unixfs entry node type: ${typeof entry.node}`)
+    }
+    const block = { cid, bytes: entry.node }
     return await handleBlockHtml(request, env, { ...ctx, block })
   }
 

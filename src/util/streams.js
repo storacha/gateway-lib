@@ -46,15 +46,3 @@ export function toIterable (readable) {
 
   throw new Error('unknown stream')
 }
-
-/**
- * @template T
- * @param {AsyncIterable<T>} source
- */
-export const collect = async source => {
-  const chunks = []
-  for await (const chunk of source) {
-    chunks.push(chunk)
-  }
-  return chunks
-}
