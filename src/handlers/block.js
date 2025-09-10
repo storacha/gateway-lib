@@ -1,10 +1,22 @@
 /* eslint-env browser */
+/**
+ * @import { Block } from 'dagula'
+ * @import { BlockDecoder } from 'multiformats'
+ * @import { IpfsUrlContext, BlockContext, UnixfsContext, TimeoutController } from '../bindings.js'
+ */
+import * as dagJSON from '@ipld/dag-json'
+import * as dagCBOR from '@ipld/dag-cbor'
+import './templates/bundle.cjs'
 import { MultipartByteRange } from 'multipart-byte-range'
+import { hexdump } from '@gct256/hexdump'
+import { CID } from 'multiformats/cid'
 import { decodeRangeHeader, resolveRange } from '../util/range.js'
 import { HttpError } from '../util/errors.js'
+import { getTemplate, registerHelper } from '../util/handlebars.js'
 
 /**
- * @typedef {import('../bindings.js').IpfsUrlContext & import('../bindings.js').BlockContext & import('../bindings.js').UnixfsContext & { timeoutController?: import('../bindings.js').TimeoutControllerContext['timeoutController'] }} BlockHandlerContext
+ * @typedef {IpfsUrlContext & BlockContext & UnixfsContext & { timeoutController?: TimeoutController }} BlockHandlerContext
+ * @typedef {IpfsUrlContext & { gatewayDomain?: string, block: Block }} BlockHtmlHandlerContext
  */
 
 /** @type {import('../bindings.js').Handler<BlockHandlerContext>} */
@@ -124,4 +136,117 @@ const handleMultipartRange = async (blocks, cid, ranges, options) => {
     contentType: 'application/vnd.ipld.raw'
   })
   return new Response(source, { status: 206, headers: { ...options?.headers, ...source.headers } })
+}
+
+/** @type {Record<number, BlockDecoder<number, unknown>>} */
+const codecs = {
+  [dagCBOR.code]: dagCBOR,
+  [dagJSON.code]: dagJSON
+}
+
+/** @type {Record<number, string>} */
+const codecNames = {
+  [dagCBOR.code]: 'dag-cbor',
+  [dagJSON.code]: 'dag-json'
+}
+
+/** @param {unknown} obj */
+const isIpldScalar = obj => {
+  switch (typeof obj) {
+    case 'string':
+      return true
+    case 'boolean':
+      return true
+    case 'number':
+      return true
+    case 'object': {
+      if (obj == null) {
+        return true
+      }
+      if (obj instanceof Uint8Array) { // IPLD bytes
+        return true
+      }
+      if (obj instanceof CID) {
+        return true
+      }
+      break
+    }
+  }
+  return false
+}
+registerHelper('isIpldScalar', isIpldScalar)
+
+/** @param {unknown} obj */
+const isIpldList = obj => Array.isArray(obj)
+registerHelper('isIpldList', isIpldList)
+
+/** @param {unknown} obj */
+const isIpldLink = obj => obj instanceof CID
+registerHelper('isIpldLink', isIpldLink)
+
+/** @param {unknown} obj */
+const isIpldMap = obj => {
+  return obj != null && typeof obj === 'object' && !isIpldScalar(obj) && !isIpldList(obj)
+}
+registerHelper('isIpldMap', isIpldMap)
+
+/** @param {unknown} obj */
+const isIpldBytes = obj => obj instanceof Uint8Array
+registerHelper('isIpldBytes', isIpldBytes)
+
+registerHelper('formatIpldScalar', (/** @type {unknown} */ obj) => {
+  switch (typeof obj) {
+    case 'string':
+      return obj
+    case 'boolean':
+      return obj ? 'true' : 'false'
+    case 'number':
+      return obj.toString()
+    case 'object': {
+      if (obj == null) {
+        return 'NULL'
+      }
+      if (obj instanceof Uint8Array) {
+        return hexdump(obj).join('\n')
+      }
+      break
+    }
+  }
+  return 'UNKNOWN'
+})
+
+/** @type {import('../bindings.js').Handler<BlockHtmlHandlerContext>} */
+export async function handleBlockHtml (request, env, ctx) {
+  const { dataCid, path, block } = ctx
+  if (!dataCid) throw new Error('missing data CID')
+  if (path == null) throw new Error('missing URL pathname')
+  if (!block) throw new Error('missing block')
+
+  const codec = codecs[block.cid.code]
+  if (!codec) {
+    throw new HttpError('unsupported entry type', { status: 501 })
+  }
+
+  const headers = {
+    'Content-Type': 'text/html'
+  }
+
+  if (request.method === 'HEAD') {
+    return new Response(null, { headers })
+  }
+  if (request.method !== 'GET') {
+    throw new HttpError('method not allowed', { status: 405 })
+  }
+
+  const isSubdomain = new URL(request.url).hostname.includes('.ipfs.')
+  const html = getTemplate('block')({
+    gatewayDomain: ctx.gatewayDomain || 'storacha.link',
+    path: isSubdomain ? ctx.path : `${ctx.dataCid}/${ctx.path}`,
+    cid: block.cid,
+    codecName: codecNames[block.cid.code] ?? 'UNKNOWN',
+    codecHex: `0x${block.cid.code.toString(16)}`,
+    value: codec.decode(block.bytes)
+  })
+
+  return new Response(html)
 }

@@ -65,8 +65,11 @@
   "author": "Alan Shaw",
   "license": "Apache-2.0 OR MIT",
   "dependencies": {
+    "@gct256/hexdump": "^0.1.2",
     "@httpland/range-parser": "^1.2.0",
     "@ipld/car": "^5.2.6",
+    "@ipld/dag-cbor": "^9.2.5",
+    "@ipld/dag-json": "^10.2.5",
     "@web3-storage/handlebars": "^1.0.0",
     "bytes": "^3.1.2",
     "chardet": "^2.0.0",
@@ -79,13 +82,12 @@
     "uint8arrays": "^5.0.1"
   },
   "devDependencies": {
-    "@ipld/dag-cbor": "^9.0.8",
     "@ipld/dag-pb": "^4.0.8",
     "@types/bytes": "^3.1.4",
     "ipfs-unixfs": "^11.1.2",
     "ipfs-unixfs-exporter": "^13.3.0",
     "standard": "^17.1.0",
-    "typescript": "^5.3.3"
+    "typescript": "^5.9.2"
   },
   "publishConfig": {
     "access": "public"

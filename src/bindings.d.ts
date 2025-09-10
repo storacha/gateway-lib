@@ -3,7 +3,7 @@ import type { UnixFSEntry } from 'ipfs-unixfs-exporter'
 import type { BlockService, DagService, UnixfsService } from 'dagula'
 import type { TimeoutController } from 'timeout-abort-controller'
 
-export {}
+export { TimeoutController }
 
 export interface Environment {
   DEBUG?: string

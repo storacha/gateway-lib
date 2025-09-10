@@ -8,7 +8,7 @@
         </td>
         <td class="no-linebreak">
           {{#if hash}}
-          <a class="ipfs-hash" translate="no" href={{#if @root.dnsLink}}"https://cid.ipfs.io/#{{encodeURIComponent hash}}" target="_blank" rel="noreferrer noopener"{{else}}"/ipfs/{{encodeURIComponent hash}}?filename={{encodeURIComponent name}}"{{/if}}>
+          <a class="ipfs-hash" translate="no" href={{#if @root.dnsLink}}"https://cid.ipfs.tech/#{{encodeURIComponent hash}}" target="_blank" rel="noreferrer noopener"{{else}}"/ipfs/{{encodeURIComponent hash}}?filename={{encodeURIComponent name}}"{{/if}}>
             {{shortHash hash}}
           </a>
           {{/if}}

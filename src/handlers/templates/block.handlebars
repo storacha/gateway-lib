@@ -2,13 +2,13 @@
 <html lang="en">
 <head>
 <meta charset="utf-8" />
-<meta name="description" content="A directory of files hosted on the distributed, decentralized web using IPFS">
+<meta name="description" content="Content-addressed {{codecName}} document hosted on IPFS">
 <meta property="og:title" content="Files on IPFS">
 <meta property="og:description" content="{{path}}">
 <meta property="og:type" content="website">
 <meta property="og:image" content="https://bafybeig5nqh5iik5jazmxr7rjhthkbgzcjq6zx4huarbwhz3btzz6cgyty.ipfs.{{gatewayDomain}}/social-card.png">
 <meta name="twitter:title" content="{{path}}">
-<meta name="twitter:description" content="A directory of files hosted on the distributed, decentralized web using IPFS">
+<meta name="twitter:description" content="Content-addressed {{codecName}} document hosted on IPFS">
 <meta name="twitter:card" content="summary_large_image">
 <meta name="twitter:image" content="https://bafybeig5nqh5iik5jazmxr7rjhthkbgzcjq6zx4huarbwhz3btzz6cgyty.ipfs.{{gatewayDomain}}/social-card.png">
 <meta name="twitter:creator" content="@ipfs">
@@ -18,6 +18,44 @@
 <link rel="shortcut icon" href="data:image/x-icon;base64,AAABAAEAEBAAAAEAIABoBAAAFgAAACgAAAAQAAAAIAAAAAEAIAAAAAAAAAQAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAlo89/56ZQ/8AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAACUjDu1lo89/6mhTP+zrVP/nplD/5+aRK8AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAHNiIS6Wjz3/ubFY/761W/+vp1D/urRZ/8vDZf/GvmH/nplD/1BNIm8AAAAAAAAAAAAAAAAAAAAAAAAAAJaPPf+knEj/vrVb/761W/++tVv/r6dQ/7q0Wf/Lw2X/y8Nl/8vDZf+tpk7/nplD/wAAAAAAAAAAAAAAAJaPPf+2rVX/vrVb/761W/++tVv/vrVb/6+nUP+6tFn/y8Nl/8vDZf/Lw2X/y8Nl/8G6Xv+emUP/AAAAAAAAAACWjz3/vrVb/761W/++tVv/vrVb/761W/+vp1D/urRZ/8vDZf/Lw2X/y8Nl/8vDZf/Lw2X/nplD/wAAAAAAAAAAlo89/761W/++tVv/vrVb/761W/++tVv/r6dQ/7q0Wf/Lw2X/y8Nl/8vDZf/Lw2X/y8Nl/56ZQ/8AAAAAAAAAAJaPPf++tVv/vrVb/761W/++tVv/vbRa/5aPPf+emUP/y8Nl/8vDZf/Lw2X/y8Nl/8vDZf+emUP/AAAAAAAAAACWjz3/vrVb/761W/++tVv/vrVb/5qTQP+inkb/op5G/6KdRv/Lw2X/y8Nl/8vDZf/Lw2X/nplD/wAAAAAAAAAAlo89/761W/++tVv/sqlS/56ZQ//LxWb/0Mlp/9DJaf/Kw2X/oJtE/7+3XP/Lw2X/y8Nl/56ZQ/8AAAAAAAAAAJaPPf+9tFr/mJE+/7GsUv/Rymr/0cpq/9HKav/Rymr/0cpq/9HKav+xrFL/nplD/8vDZf+emUP/AAAAAAAAAACWjz3/op5G/9HKav/Rymr/0cpq/9HKav/Rymr/0cpq/9HKav/Rymr/0cpq/9HKav+inkb/nplD/wAAAAAAAAAAAAAAAKKeRv+3slb/0cpq/9HKav/Rymr/0cpq/9HKav/Rymr/0cpq/9HKav+1sFX/op5G/wAAAAAAAAAAAAAAAAAAAAAAAAAAop5GUKKeRv/Nxmf/0cpq/9HKav/Rymr/0cpq/83GZ/+inkb/op5GSAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAop5G16KeRv/LxWb/y8Vm/6KeRv+inkaPAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAop5G/6KeRtcAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA/n8AAPgfAADwDwAAwAMAAIABAACAAQAAgAEAAIABAACAAQAAgAEAAIABAACAAQAAwAMAAPAPAAD4HwAA/n8AAA==" />
 <title>{{path}}</title>
 <link rel="stylesheet" href="https://bafybeig5nqh5iik5jazmxr7rjhthkbgzcjq6zx4huarbwhz3btzz6cgyty.ipfs.{{gatewayDomain}}/main.css">
+<style>
+.nowrap {
+	white-space: nowrap;
+}
+.grid {
+	display: grid;
+	overflow-x: auto;
+}
+.grid .grid {
+	overflow-x: visible;
+}
+.grid > div {
+	padding: .7em;
+	border-bottom: 1px solid #d9dbe2;
+}
+.grid.dag {
+	grid-template-columns: max-content 1fr;
+}
+.grid.dag pre {
+	margin: 0;
+}
+.grid.dag .grid {
+	padding: 0;
+}
+.grid.dag > div:nth-last-child(-n+2) {
+	border-bottom: 0;
+}
+.grid.dag > div {
+	background: white
+}
+.grid.dag > div:nth-child(4n),
+.grid.dag > div:nth-child(4n+3) {
+	background-color: #f7f8fa;
+}
+.grid.dag > div:nth-of-type(2n+1) {
+	padding-left: 1em;
+}
+</style>
 </head>
 <body>
   <div id="page-header">
@@ -36,36 +74,68 @@
   </div>
   <div id="content">
     <div id="content-header" class="d-flex flex-wrap">
-      <div>
-        <strong>
-          Index of
-          {{#each breadcrumbs~}}
-          /{{#if path}}<a href="{{encodeIPFSPath path}}">{{name}}</a>{{else}}{{name}}{{/if}}
-          {{~else}}
-          {{path}}
-          {{/each}}
-        </strong>
-        {{#if hash}}
-        <div class="ipfs-hash" translate="no">
-          {{hash}}
+      <header>
+        <div>
+          <strong>CID</strong>: <code translate="no">{{cid}}</code>
         </div>
-        {{/if}}
-      </div>
-      {{#if size includeZero=true}}
-      <div class="no-linebreak flex-shrink-1 ml-auto">
-        <strong>&nbsp;{{formatBytes size}}</strong>
-      </div>
-      {{/if}}
+        <div>
+          <strong>Codec</strong>: <code translate="no">{{codecName}} ({{codecHex}})</code>
+        </div>
+      </header>
     </div>
     <div class="table-responsive">
-    <table>
-      <tr>
-        <td class="type-icon">
-          <div class="ipfs-_blank">&nbsp;</div>
-        </td>
-        <td>
-          <a href="{{encodeIPFSPath backLink}}">..</a>
-        </td>
-        <td></td>
-        <td></td>
-      </tr>
+      <table>
+        <tr>
+          <td>
+            <p>You can download this block as:</p>
+            <ul>
+              <li><a href="?format=raw" rel="nofollow">Raw Block</a> (no conversion)</li>
+              {{! No support for re-encoding yet...
+              <li><a href="?format=dag-json" rel="nofollow">Valid DAG-JSON</a> (specs at <a href="https://ipld.io/specs/codecs/dag-json/spec/" target="_blank" rel="noopener noreferrer">IPLD</a> and <a href="https://www.iana.org/assignments/media-types/application/vnd.ipld.dag-json" target="_blank" rel="noopener noreferrer">IANA</a>)</li>
+              <li><a href="?format=dag-cbor" rel="nofollow">Valid DAG-CBOR</a> (specs at <a href="https://ipld.io/specs/codecs/dag-cbor/spec/" target="_blank" rel="noopener noreferrer">IPLD</a> and <a href="https://www.iana.org/assignments/media-types/application/vnd.ipld.dag-cbor" target="_blank" rel="noopener noreferrer">IANA</a>)</li>
+              }}
+            </ul>
+          </td>
+        </tr>
+        <tr style="border-bottom:1px solid #d9dbe2">
+          <td>
+            <strong><span translate="no" style="text-transform: uppercase;">{{codecName}}</span> Preview</strong>
+          </td>
+        </tr>
+        <tr></tr>
+      </table>
+      {{> renderIpldValue value=value }}
+    </div>
+  </div>
+</body>
+</html>
+
+{{#*inline "renderIpldValue" value}}
+  {{#if (isIpldScalar value)}}
+    {{#if (isIpldLink value)}}
+      <div><a style="color:#7f8491" href="https://{{@root.gatewayDomain}}/ipfs/{{value}}"><code class="nowrap">{{value}}</code></a></div>
+    {{else}}
+      {{#if (isIpldBytes value)}}
+        <div><pre style="white-space:pre-line">{{formatIpldScalar value}}</pre></div>
+      {{else}}
+        <div><code class="nowrap">{{formatIpldScalar value}}</code></div>
+      {{/if}}
+    {{/if}}
+  {{/if}}
+  {{#if (isIpldList value)}}
+    <div class="grid dag">
+      {{#each value}}
+        <div><code class="nowrap">{{@index}}</code></div>
+        {{> renderIpldValue value=this}}
+      {{/each}}
+    </div>
+  {{/if}}
+  {{#if (isIpldMap value)}}
+    <div class="grid dag">
+      {{#each value}}
+        <div><code class="nowrap">{{@key}}</code></div>
+        {{> renderIpldValue value=this}}
+      {{/each}}
+    </div>
+  {{/if}}
+{{/inline}}

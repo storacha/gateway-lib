@@ -1,29 +1,18 @@
 /* eslint-env browser */
+/**
+ * @import { UnixfsEntryContext, IpfsUrlContext, UnixfsContext, TimeoutController } from '../bindings.js'
+ */
 import { fromString } from 'uint8arrays/from-string'
-import Handlebars from '@web3-storage/handlebars/runtime.js'
 import bytes from 'bytes'
 import './templates/bundle.cjs'
 import { toReadableStream } from '../util/streams.js'
+import { registerHelper, getTemplate } from '../util/handlebars.js'
 import { handleUnixfsFile } from './unixfs-file.js'
 import { HttpError } from '../util/errors.js'
 
 /**
- * @typedef {import('../bindings.js').UnixfsEntryContext & import('../bindings.js').IpfsUrlContext & import('../bindings.js').UnixfsContext & { timeoutController?: import('../bindings.js').TimeoutControllerContext['timeoutController'] }} UnixfsDirectoryHandlerContext
+ * @typedef {UnixfsEntryContext & IpfsUrlContext & UnixfsContext & { gatewayDomain?: string, timeoutController?: TimeoutController }} UnixfsDirectoryHandlerContext
  */
-
-/**
- * @param {string} name
- * @param {(v: any) => string} fn
- */
-// @ts-ignore missing handlebars types
-const registerHelper = (name, fn) => Handlebars.registerHelper(name, fn)
-
-/**
- * @param {string} name
- * @returns {(data?: any) => string}
- */
-// @ts-ignore missing handlebars types
-const getTemplate = (name) => Handlebars.templates[name]
 
 registerHelper('encodeIPFSPath', (/** @type {string} */ p) => p.split('/').map(s => encodeURIComponent(s)).join('/'))
 registerHelper('encodeURIComponent', encodeURIComponent)
@@ -90,6 +79,7 @@ export async function handleUnixfsDir (request, env, ctx) {
     const parts = entry.path.split('/')
     yield fromString(
       getTemplate('unixfs-dir-header')({
+        gatewayDomain: ctx.gatewayDomain || 'storacha.link',
         path: entryPath(entry.path),
         name: entry.name,
         hash: entry.cid.toString(),
